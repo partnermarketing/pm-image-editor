@@ -1,6 +1,7 @@
 # pm-image-crop
 
 [![License](https://img.shields.io/npm/l/pm-image-crop.svg)](https://www.npmjs.com/package/pm-image-crop)
+[![Build Status](https://travis-ci.org/partnermarketing/pm-image-crop.svg?branch=master)](https://travis-ci.org/partnermarketing/pm-image-crop)
 [![Bower](https://img.shields.io/bower/v/pm-image-crop.svg)](http://bower.io/search/?q=pm-image-crop)
 [![NPM](https://img.shields.io/npm/v/pm-image-crop.svg)](https://www.npmjs.com/package/pm-image-crop)
 
