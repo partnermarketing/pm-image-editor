@@ -1,5 +1,9 @@
 # pm-image-crop
 
+[![License](https://img.shields.io/npm/l/pm-image-crop.svg)](https://www.npmjs.com/package/pm-image-crop)
+[![Bower](https://img.shields.io/bower/v/pm-image-crop.svg)](http://bower.io/search/?q=pm-image-crop)
+[![NPM](https://img.shields.io/npm/v/pm-image-crop.svg)](https://www.npmjs.com/package/pm-image-crop)
+
 Image Crop directive for AngularJS. Enables to crop a circle or a square out of an image.
 
 ## Screenshots
