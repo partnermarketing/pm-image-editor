@@ -1,6 +1,6 @@
-# ngImgCrop
+# pm-image-crop
 
-Simple Image Crop directive for AngularJS. Enables to crop a circle or a square out of an image.
+Image Crop directive for AngularJS. Enables to crop a circle or a square out of an image.
 
 ## Screenshots
 
@@ -172,7 +172,7 @@ Assignable angular expression to data-bind to. NgImgCrop puts a data uri of a cr
 *Optional*. Expression to evaluate when the source image didn't load.
 
 
-## License
+## Copyrights
 
-See the [LICENSE](https://github.com/alexk111/ngImgCrop/blob/master/LICENSE) file.
+This project was based on [ngImgCrop](https://github.com/alexk111/ngImgCrop) by Alex Kaul.
 
