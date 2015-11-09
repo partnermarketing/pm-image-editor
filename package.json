@@ -48,5 +48,8 @@
     "minimist": "^0.2.0",
     "opn": "^0.1.2",
     "tiny-lr": "0.0.7"
+  },
+  "scripts": {
+    "lint": "gulp lint"
   }
 }
