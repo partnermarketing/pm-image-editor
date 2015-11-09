@@ -178,5 +178,6 @@ Assignable angular expression to data-bind to. NgImgCrop puts a data uri of a cr
 
 ## Copyrights
 
-This project was based on [ngImgCrop](https://github.com/alexk111/ngImgCrop) by Alex Kaul.
-
+This project is based on [ngImgCrop](https://github.com/alexk111/ngImgCrop) by Alex Kaul.
+The project was not being maintained and we wanted to implement new features so we decided to take Alex's work and
+continue to share our vision along with the community.
