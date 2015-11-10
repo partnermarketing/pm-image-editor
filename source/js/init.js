@@ -1,3 +1,6 @@
-'use strict';
+(function () {
+    'use strict';
 
-var crop = angular.module('ngImgCrop', []);
+    angular.module('ngImgCrop', []);
+}());
+
