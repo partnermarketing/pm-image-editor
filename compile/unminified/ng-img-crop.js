@@ -1171,7 +1171,7 @@ crop.service('cropEXIF', [function() {
               if (numValues == 1) {
                   numerator = file.getUint32(valueOffset, !bigEnd);
                   denominator = file.getUint32(valueOffset+4, !bigEnd);
-                  val = new Number(numerator / denominator);
+                  val = Number(numerator / denominator);
                   val.numerator = numerator;
                   val.denominator = denominator;
                   return val;
@@ -1180,7 +1180,7 @@ crop.service('cropEXIF', [function() {
                   for (n=0;n<numValues;n++) {
                       numerator = file.getUint32(valueOffset + 8*n, !bigEnd);
                       denominator = file.getUint32(valueOffset+4 + 8*n, !bigEnd);
-                      vals[n] = new Number(numerator / denominator);
+                      vals[n] = Number(numerator / denominator);
                       vals[n].numerator = numerator;
                       vals[n].denominator = denominator;
                   }
@@ -1322,12 +1322,12 @@ crop.service('cropEXIF', [function() {
           }
       }
       return true;
-  }
+  };
 
   this.getTag = function(img, tag) {
       if (!imageHasData(img)) return;
       return img.exifdata[tag];
-  }
+  };
 
   this.getAllTags = function(img) {
       if (!imageHasData(img)) return {};
@@ -1340,7 +1340,7 @@ crop.service('cropEXIF', [function() {
           }
       }
       return tags;
-  }
+  };
 
   this.pretty = function(img) {
       if (!imageHasData(img)) return "";
@@ -1361,7 +1361,7 @@ crop.service('cropEXIF', [function() {
           }
       }
       return strPretty;
-  }
+  };
 
   this.readFromBinaryFile = function(file) {
       return findEXIFinJPEG(file);

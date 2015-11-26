@@ -28,13 +28,13 @@ var today = new Date();
 var Config = {
   port: 9000,
   livereloadPort: 35728,
-  testPage: 'test/ng-img-crop.html',
+  testPage: 'test/pm-image-crop.html',
   cache: (typeof argv.cache !== 'undefined' ? !!argv.cache : true),
   paths: {
     source:   {
-      root:   'source',
-      js:     'source/js',
-      scss:   'source/scss'
+      root:   'src',
+      js:     'src/js',
+      scss:   'src/scss'
     },
     compileUnminified: {
       root:   'compile/unminified',
@@ -81,7 +81,7 @@ gulp.task('scripts', function(){
   return gulp.src([
       Config.paths.source.js + '/init.js',
       Config.paths.source.js + '/classes/*.js',
-      Config.paths.source.js + '/ng-img-crop.js'
+      Config.paths.source.js + '/pm-image-crop.js'
     ])
     .pipe(concat(pkg.name+'.js', {
       separator: '\n\n',
