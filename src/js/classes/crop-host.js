@@ -2,7 +2,7 @@
   'use strict';
 
 
-  angular.module('ngImgCrop').factory('cropHost', ['$document', 'cropAreaCircle', 'cropAreaSquare', 'cropEXIF', function($document, CropAreaCircle, CropAreaSquare, cropEXIF) {
+  angular.module('pmImageCrop').factory('cropHost', ['$document', 'cropAreaCircle', 'cropAreaSquare', 'cropEXIF', function($document, CropAreaCircle, CropAreaSquare, cropEXIF) {
     /* STATIC FUNCTIONS */
 
     // Get Element's Offset

@@ -5,7 +5,7 @@
     'use strict';
 
 
-    angular.module('ngImgCrop').service('cropEXIF', [function() {
+    angular.module('pmImageCrop').service('cropEXIF', [function() {
       var debug = false;
 
       var ExifTags = this.Tags = {

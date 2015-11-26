@@ -2,7 +2,7 @@
   'use strict';
 
 
-  angular.module('ngImgCrop').factory('cropPubSub', [function() {
+  angular.module('pmImageCrop').factory('cropPubSub', [function() {
     return function() {
       var events = {};
       // Subscribe

@@ -1,7 +1,7 @@
 (function () {
   'use strict';
 
-  angular.module('ngImgCrop').directive('imgCrop', ['$timeout', 'cropHost', 'cropPubSub', function($timeout, CropHost, CropPubSub) {
+  angular.module('pmImageCrop').directive('imgCrop', ['$timeout', 'cropHost', 'cropPubSub', function($timeout, CropHost, CropPubSub) {
     return {
       restrict: 'E',
       scope: {

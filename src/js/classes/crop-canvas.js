@@ -2,7 +2,7 @@
   'use strict';
 
 
-  angular.module('ngImgCrop').factory('cropCanvas', [function() {
+  angular.module('pmImageCrop').factory('cropCanvas', [function() {
     // Shape = Array of [x,y]; [0, 0] - center
     var shapeArrowNW=[[-0.5,-2],[-3,-4.5],[-0.5,-7],[-7,-7],[-7,-0.5],[-4.5,-3],[-2,-0.5]];
     var shapeArrowNE=[[0.5,-2],[3,-4.5],[0.5,-7],[7,-7],[7,-0.5],[4.5,-3],[2,-0.5]];

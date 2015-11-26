@@ -1,7 +1,7 @@
 (function () {
   'use strict';
 
-  angular.module('ngImgCrop').factory('cropArea', ['cropCanvas', function(CropCanvas) {
+  angular.module('pmImageCrop').factory('cropArea', ['cropCanvas', function(CropCanvas) {
     var CropArea = function(ctx, events) {
       this._ctx=ctx;
       this._events=events;
