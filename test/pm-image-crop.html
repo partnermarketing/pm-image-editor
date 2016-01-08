@@ -4,25 +4,26 @@
   <title>ngImgCrop Test Page</title>
   <script type="text/javascript" src="../bower_components/angular/angular.min.js"></script>
   <!--<script src="//ajax.googleapis.com/ajax/libs/angularjs/1.3.0/angular.min.js"></script>-->
-  <script type="text/javascript" src="../compile/unminified/pm-image-crop.js"></script>
-  <link rel="stylesheet" href="../compile/unminified/pm-image-crop.css"/>
+  <!--script type="text/javascript" src="../compile/unminified/pm-image-crop.js"></script-->
+  <script type="text/javascript" src="../compile/unminified/pm-image-editor.js"></script>
+  <link rel="stylesheet" href="../compile/unminified/pm-image-editor.css"/>
   <style>
     .cropArea {
-      background: #E4E4E4;
+      /*background: #E4E4E4;*/
       margin: auto;
       overflow: hidden;
     }
     .cropArea.big {
       width:800px;
-      height:600px;
+      height:650px;
     }
     .cropArea.medium {
       width:500px;
-      height:350px;
+      height:400px;
     }
     .cropArea.small {
       width:300px;
-      height:200px;
+      /*height:250px;*/
     }
   </style>
 </head>
@@ -80,7 +81,7 @@
   </div>
 
   <div ng-if="enableCrop" class="cropArea" ng-class="{'big':size=='big', 'medium':size=='medium', 'small':size=='small'}">
-    <img-crop image="imageDataURI"
+    <!--img-crop image="imageDataURI"
               result-image="$parent.resImageDataURI"
               change-on-fly="changeOnFly"
               area-type="{{type}}"
@@ -92,7 +93,14 @@
               on-load-begin="onLoadBegin()"
               on-load-done="onLoadDone()"
               on-load-error="onLoadError()"
-    ></img-crop>
+    ></img-crop-->
+
+    <image-editor image="'test.jpg'"
+                  width="300"
+                  selection-width="100"
+                  selection-height="75"
+    ></image-editor>
+
               <!--aspect-ratio="aspectRatio"-->
   </div>
 
@@ -104,7 +112,7 @@
   </div>
 
   <script type="text/javascript">
-    angular.module('app', ['pmImageCrop'])
+    angular.module('app', ['pmImageEditor'])
       .controller('Ctrl', function($scope) {
         $scope.size='small';
         $scope.type='circle';
