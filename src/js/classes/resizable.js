@@ -445,10 +445,6 @@
         // Bind events to track resize.
         $document.on('mousemove', $scope.resizableMousemove);
         $document.on('mouseup', $scope.resizableMouseup);
-
-        if (angular.isFunction($scope.resizeStart)) {
-          $scope.resizeStart(event, $scope.uiParams());
-        }
       };
 
       $scope.resizableMousemove = function(event) {
@@ -470,9 +466,6 @@
         $document.unbind('mousemove', $scope.resizableMousemove);
         $document.unbind('mouseup', $scope.resizableMouseup);
 
-        if (angular.isFunction($scope.resizeStop)) {
-          $scope.resizeStop(event, $scope.uiParams());
-        }
         $rootScope.$broadcast('resizeStop', event, $scope.resizableUiParams());
       };
     }).

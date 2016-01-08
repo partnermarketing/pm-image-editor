@@ -328,6 +328,7 @@ describe('Resizable', function () {
         var ctrl,
             scope,
             document,
+            rootScope,
             factory,
             createCtrl;
 
@@ -336,11 +337,13 @@ describe('Resizable', function () {
             ctrl = $controller;
             document = _$document_;
             factory = ResizableFactory;
+            rootScope = $rootScope
 
             createCtrl = function() {
                 ctrl('ResizableController', {
                     '$scope': scope,
                     '$document': document,
+                    '$rootScope': rootScope,
                     'ResizableFactory': factory
                 });
             };
@@ -361,7 +364,7 @@ describe('Resizable', function () {
             scope.resizableFactory.setOriginalSize(scope.element);
             scope.resizableFactory.setOriginalPosition(100, 200);
 
-            expect(scope.uiParams()).toEqual({
+            expect(scope.resizableUiParams()).toEqual({
                 element: scope.element,
                 position: {
                     top: 100,
@@ -403,25 +406,6 @@ describe('Resizable', function () {
 
         });
 
-        it('should call scope.resizeStart function if mousedown called', function() {
-            var event = {
-                preventDefault: jasmine.createSpy('preventDefault'),
-                stopPropagation: jasmine.createSpy('stopPropagation'),
-                screenX: 10,
-                screenY: 20
-            };
-            scope.resizeStart = jasmine.createSpy('start');
-            scope.element = angular.element('<div/>');
-            
-            createCtrl();
-
-            spyOn(scope.resizableFactory, 'resizeStart');
-
-            scope.resizableHandleMousedown(event);
-
-            expect(scope.resizeStart).toHaveBeenCalled();
-        });
-
         it('should unbind document events if mouseup called', function() {
             spyOn(document, 'unbind');
 
@@ -434,14 +418,14 @@ describe('Resizable', function () {
             expect(document.unbind.calls.argsFor(1)).toEqual(['mouseup', scope.resizableMouseup]);
         });
 
-        it('should call scope.resizeStop function if mouseup called', function() {
-            scope.resizeStop = jasmine.createSpy('stop');
+        it('should broadcast dragStop event if mouseup called', function() {
+            spyOn(rootScope, '$broadcast');
 
             createCtrl();
 
             scope.resizableMouseup();
 
-            expect(scope.resizeStop).toHaveBeenCalled();
+            expect(rootScope.$broadcast).toHaveBeenCalledWith('resizeStop', event, scope.resizableUiParams());
         });
 
         it('should update element position if mousemove called', function() {
