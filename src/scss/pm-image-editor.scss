@@ -1,0 +1,117 @@
+image-editor {
+  width: 100%;
+  display: block;
+  position: relative;
+  overflow: hidden;
+  padding-bottom: 50px;
+
+  .image-editor-canvas {
+    width: 100%;
+    position: relative;
+    overflow: hidden;
+  }
+
+
+  image-selection {
+    display: block;
+    box-sizing: border-box;
+    border: 1px solid #f00;
+    width: 100px;
+    height: 50px;
+    overflow: hidden;
+    z-index: 10;
+
+    &[draggable] {
+      cursor: move;
+    }
+  }
+
+  editor-panel {
+    display: block;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+
+    span {
+      float: left;
+      display: block;
+      margin-right: 8px;
+      height: 32px;
+      width: 32px;
+      background: transparent url(image-edit-icons.png) 0 0 no-repeat;
+    }
+    .image-editor-rotate-cw {
+        background-position: -32px 0;
+    }
+    .image-editor-rotate-acw {
+        background-position: -64px 0;
+    }
+    .image-editor-flip-v {
+        background-position: -96px 0;
+    }
+    .image-editor-flip-h {
+        background-position: -128px 0;
+    }
+    .image-editor-undo {
+        background-position: -160px 0;
+    }
+    .image-editor-redo {
+        background-position: -192px 0;
+    }
+    .disabled {
+        opacity: 0.5;
+        filter: alpha(opacity=50);
+    }
+  }
+
+  .resizable-handle {
+    position: absolute;
+    width: 6px;
+    height: 6px;
+    border: 1px solid #f00;
+  }
+  .resizable-nw {
+    cursor: nw-resize;
+    left: 0;
+    top: 0;
+  }
+  .resizable-ne {
+    cursor: ne-resize;
+    right: 0;
+    top: 0;
+  }
+  .resizable-sw {
+    bottom: 0;
+    cursor: sw-resize;
+    left: 0;
+  }
+  .resizable-se {
+    bottom: 0;
+    cursor: se-resize;
+    right: 0;
+  }
+  .resizable-n {
+    cursor: n-resize;
+    left: 50%;
+    margin-left: -3px;
+    top: 0;
+  }
+  .resizable-s {
+    bottom: 0;
+    cursor: s-resize;
+    left: 50%;
+    margin-left: -3px;
+  }
+  .resizable-w {
+    cursor: w-resize;
+    left: 0;
+    margin-top: -3px;
+    top: 50%;
+  }
+  .resizable-e {
+    cursor: e-resize;
+    margin-top: -3px;
+    right: 0;
+    top: 50%;
+  }  
+}
