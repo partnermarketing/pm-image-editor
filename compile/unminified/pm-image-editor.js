@@ -2,10 +2,10 @@
  * undefined v0.3.2
  * https://github.com/partnermarketing/pm-image-crop
  *
- * Copyright (c) 2015 Partnermarketing.com
+ * Copyright (c) 2016 Partnermarketing.com
  * License: MIT
  *
- * Generated at Monday, December 28th, 2015, 11:23:47 AM
+ * Generated at Friday, January 8th, 2016, 1:44:25 PM
  */
 (function() {
 'use strict';
@@ -1832,173 +1832,881 @@
     }]);
 }());
 
-angular.module('pmImageEditor').
-  directive('draggable', function($document) {
-    return function(scope, element, attr) {
-      var startX = 0,
-          startY = 0,
-          x = 0,
-          y = 0;
-      
-      element.css({
-       position: 'relative',
-       border: '1px solid red',
-       backgroundColor: 'lightgrey',
-       cursor: 'pointer',
-       display: 'block',
-       width: '65px'
-      });
-      element.on('mousedown', function(event) {
-        // Prevent default dragging of selected content
+(function () {
+  angular.module('pmImageEditor').
+    controller('DraggableController', function($scope, $document, $rootScope) {
+      // Start X and Y position of the draggable element.
+      $scope.startX = 0;
+      $scope.startY = 0;
+
+      // Coordinates of the top-left corner of draggable element.
+      $scope.x = 0;
+      $scope.y = 0;
+
+      $scope.draggableUiParams = function() {
+        return {
+          element: $scope.element,
+          position: {
+            top: $scope.y,
+            left:  $scope.x
+          }
+        };
+      }
+
+      $scope.mousedown = function(event) {
+        // Prevent default dragging of selected content.
         event.preventDefault();
-        startX = event.screenX - x;
-        startY = event.screenY - y;
-        $document.on('mousemove', mousemove);
-        $document.on('mouseup', mouseup);
-      });
 
-      function mousemove(event) {
-        y = event.screenY - startY;
-        x = event.screenX - startX;
-        element.css({
-          top: y + 'px',
-          left:  x + 'px'
-        });
-      }
+        $scope.x = parseInt($scope.element.css('left'), 10) || 0; 
+        $scope.y = parseInt($scope.element.css('top'), 10) || 0; 
 
-      function mouseup() {
-        $document.unbind('mousemove', mousemove);
-        $document.unbind('mouseup', mouseup);
-      }
-    };
-  });
+        // Remember start position for top-left corner of the element.
+        $scope.startX = event.screenX - $scope.x;
+        $scope.startY = event.screenY - $scope.y;
+
+        // Bind events to track drag.
+        $document.on('mousemove', $scope.mousemove);
+        $document.on('mouseup', $scope.mouseup);
+
+        if (angular.isFunction($scope.dragStart)) {
+          $scope.dragStart(event, $scope.draggableUiParams());
+        }
+      };
+
+      $scope.mousemove = function(event) {
+        var elementWidth = parseInt($scope.element.css('width'), 10) || $scope.element[0].clientWidth,
+            elementHeight = parseInt($scope.element.css('height'), 10) || $scope.element[0].clientHeight,
+            parentWidth = $scope.parentElement[0].clientWidth,
+            parentHeight = $scope.parentElement[0].clientHeight;
+
+          // Calculate new top-left position and check that it stays positive.
+          $scope.y = Math.max(event.screenY - $scope.startY, 0);
+          $scope.x = Math.max(event.screenX - $scope.startX, 0);
+
+          // Doublecheck that new x and y is not go out from parent borders.
+          if ($scope.x + elementWidth > parentWidth) {
+            $scope.x = parentWidth - elementWidth;
+          }
+
+          if ($scope.y + elementHeight > parentHeight) {
+            $scope.y = parentHeight - elementHeight;
+          }          
+
+          // Set new element position.
+          $scope.element.css({
+            top: $scope.y + 'px',
+            left:  $scope.x + 'px'
+          });
+        };
+
+        $scope.mouseup = function(event) {
+          // Unbind events that track drag.
+          $document.unbind('mousemove', $scope.mousemove);
+          $document.unbind('mouseup', $scope.mouseup);
+
+          if (angular.isFunction($scope.dragStop)) {
+            $scope.dragStop(event, $scope.draggableUiParams());
+          }          
+          $rootScope.$broadcast('dragStop', event, $scope.draggableUiParams());
+        };
+    }).
+    directive('draggable', function($document) {
+      return {
+        restrict: 'A',
+        controller: 'DraggableController',
+        link: function(scope, element, attr) {
+          scope.element = element;
+          scope.parentElement = element.parent();
+
+          element.css({ position: 'absolute' });
+
+          element.on('mousedown', function(event) {
+            scope.mousedown(event);
+          });
+        }
+      };
+    });
+}());
 
 
 
 (function () {
-        angular.module('pmImageEditor').directive('imageEditor', ['$timeout', function ($timeout) {
+        angular.module('pmImageEditor').directive('editorPanel', function () {
         return {
             restrict: 'E',
             scope: {
-                image: '=',
-                /*
-                resultImage: '=',
-
-                changeOnFly: '=',
-                areaType: '@',
-                areaMinSize: '=',
-                resultImageSize: '=',
-                resultImageFormat: '@',
-                resultImageQuality: '=',
-
-                onChange: '&',
-                onLoadBegin: '&',
-                onLoadDone: '&',
-                onLoadError: '&'
-                */
             },
-            template: '<image-selection draggable></image-selection>',
-            controller: ['$scope', function ($scope) {
-                //$scope.events = new CropPubSub();
-            }],
-            link: function (scope, element/*, attrs*/) {
-                alert('here');
-                /*
-                // Init Events Manager
-                var events = scope.events;
+            link: function (scope, element) {
+                var buttons = 'crop,rotate-cw,rotate-acw';
+                buttons.split(',').forEach(function(name){
+                    var button = angular.element('<span class="image-editor-'+name+'" />');
+                    button.on('click', function() {
+                        scope.$emit('editorButtonClick', {name: name});
+                    });
 
-                // Init Crop Host
-                var cropHost = new CropHost(element.find('canvas'), {}, events);
-
-                // Store Result Image to check if it's changed
-                var storedResultImage;
-
-                var updateResultImage = function (scope) {
-                    var resultImage = cropHost.getResultImageDataURI();
-                    if (storedResultImage !== resultImage) {
-                        storedResultImage = resultImage;
-                        if (angular.isDefined(scope.resultImage)) {
-                            scope.resultImage = resultImage;
-                        }
-                        scope.onChange({$dataURI: scope.resultImage});
-                    }
-                };
-
-                // Wrapper to safely exec functions within $apply on a running $digest cycle
-                var fnSafeApply = function (fn) {
-                    return function () {
-                        $timeout(function () {
-                            scope.$apply(function (scope) {
-                                fn(scope);
-                            });
-                        });
-                    };
-                };
-
-                // Setup CropHost Event Handlers
-                events
-                    .on('load-start', fnSafeApply(function (scope) {
-                        scope.onLoadBegin({});
-                    }))
-                    .on('load-done', fnSafeApply(function (scope) {
-                        scope.onLoadDone({});
-                    }))
-                    .on('load-error', fnSafeApply(function (scope) {
-                        scope.onLoadError({});
-                    }))
-                    .on('area-move area-resize', fnSafeApply(function (scope) {
-                        if (!!scope.changeOnFly) {
-                            updateResultImage(scope);
-                        }
-                    }))
-                    .on('area-move-end area-resize-end image-updated', fnSafeApply(function (scope) {
-                        updateResultImage(scope);
-                    }));
-
-                // Sync CropHost with Directive's options
-                scope.$watch('image', function () {
-                    cropHost.setNewImageSource(scope.image);
+                    element.append(button);
                 });
-                scope.$watch('areaType', function () {
-                    cropHost.setAreaType(scope.areaType);
-                    updateResultImage(scope);
-                });
-                scope.$watch('areaMinSize', function () {
-                    cropHost.setAreaMinSize(scope.areaMinSize);
-                    updateResultImage(scope);
-                });
-                scope.$watch('resultImageSize', function () {
-                    cropHost.setResultImageSize(scope.resultImageSize);
-                    updateResultImage(scope);
-                });
-                scope.$watch('resultImageFormat', function () {
-                    cropHost.setResultImageFormat(scope.resultImageFormat);
-                    updateResultImage(scope);
-                });
-                scope.$watch('resultImageQuality', function () {
-                    cropHost.setResultImageQuality(scope.resultImageQuality);
-                    updateResultImage(scope);
-                });
-
-                // Update CropHost dimensions when the directive element is resized
-                scope.$watch(
-                    function () {
-                        return [element[0].clientWidth, element[0].clientHeight];
-                    },
-                    function (value) {
-                        cropHost.setMaxDimensions(value[0], value[1]);
-                        updateResultImage(scope);
-                    },
-                    true
-                );
-
-                // Destroy CropHost Instance when the directive is destroying
-                scope.$on('$destroy', function () {
-                    cropHost.destroy();
-                });
-                */
             }
         };
-    }]);
+    });
+}());
+
+(function () {
+        angular.module('pmImageEditor').directive('imageSelection', function () {
+        return {
+            restrict: 'E',
+            scope: {
+                width: '@',
+                height: '@'
+            },
+            link: function (scope, element) {
+                element.css({
+                    position: 'absolute',
+                    top: '0px',
+                    left: '0px',
+                    width: scope.width+'px',
+                    height: scope.height+'px'
+                });
+
+                var emitSelectionChanged = function() {
+                    scope.$emit('selectionChanged', {
+                        top: parseInt(element.css('top'), 10),
+                        left: parseInt(element.css('left'), 10),
+                        width: parseInt(element.css('width'), 10),
+                        height: parseInt(element.css('height'), 10)
+                    });
+                }
+
+                scope.$on('dragStop', function(e, event, ui) {
+                    if (ui.element === element) {
+                        emitSelectionChanged();
+                    }
+                });
+
+                scope.$on('resizeStop', function(e, event, ui) {
+                    if (ui.element === element) {
+                        emitSelectionChanged();
+                    }
+                });                
+
+                emitSelectionChanged();
+            }
+        };
+    });
+}());
+
+(function () {
+  angular.module('pmImageEditor').
+    factory('ResizableFactory', function() {
+      var ResizableFactory = function(options) {
+        this._options = options;
+
+        // Original start and position values which was before resize.
+        this._originalSize = { width: 0, height: 0 };
+        this._originalPosition = { top: 0, left: 0 };
+
+        this._originalMousePosition = {top: 0, left: 0};
+
+        // Start and position values during resize.
+        this._position = this._originalPosition;
+        this._size = this._originalSize;
+
+        this._axis = 'se';
+        this._ratio = 1;
+      }
+
+      /**
+       * Updates necessary data when resize is starting.
+       *
+       * @param event - native event which happens on mouse down for handler.
+       * @param element - resizable element.
+       */
+      ResizableFactory.prototype.resizeStart = function(event, element) {
+        this.setOriginalMousePosition(event.screenY, event.screenX)
+
+        this.setOriginalPosition(parseInt(element.css('top'), 10) || 0, parseInt(element.css('left'), 10) || 0);
+
+        this.setParentSize(element.parent());
+
+        this.setOriginalSize(element);
+
+        this._ratio = this._size.width / this._size.height;
+
+        var axis = event.target.className.match(/resizable-(se|sw|ne|nw|n|e|s|w)/i);
+        this._axis = axis && axis[1] ? axis[1] : 'se';
+
+        this.updateVirtualBoundaries();
+      }
+
+      /**
+       * Calculates new boundary data when handler moves to screenX and screenY.
+       *
+       * @param screenX
+       * @param screenY
+       */
+      ResizableFactory.prototype.getBoundaryData = function(screenX, screenY) {
+        var boundaryData = this.updateBoundaries(
+          screenX - this._originalMousePosition.left,
+          screenY - this._originalMousePosition.top
+        );
+
+        boundaryData = this.updateRatio(boundaryData);
+
+        boundaryData = this.respectSize(boundaryData);
+
+        this.updateSizeAndPosition(boundaryData);
+
+        return this.fitContainer(boundaryData);
+      }
+
+      /**
+       * Calculates boundary object to apply when mouse pointer position changes by dx, dy
+       * through given axis. This object can contain some (at least one) of properties 
+       * { width: int, height: int, left: int, top: int }.
+       *
+       * @param int dx
+       * @param int dy
+       */
+      ResizableFactory.prototype.updateBoundaries = function(dx, dy) {
+        var originalSize = this._originalSize;
+        var originalPosition = this._originalPosition;
+
+        // This object calculates boundaries changes depends on axis.
+        var _change = {
+          e: function(dx) {
+            return { width: originalSize.width + dx };
+          },
+          w: function(dx) {
+            var cs = originalSize, sp = originalPosition;
+            return { left: sp.left + dx, width: cs.width - dx };
+          },
+          n: function(dx, dy) {
+            var cs = originalSize, sp = originalPosition;
+            return { top: sp.top + dy, height: cs.height - dy };
+          },
+          s: function(dx, dy) {
+            return { height: originalSize.height + dy };
+          },
+          se: function(dx, dy) {
+            return angular.extend(this.s.apply(this, arguments),
+              this.e.apply(this, [ dx, dy ]));
+          },
+          sw: function(dx, dy) {
+            return angular.extend(this.s.apply(this, arguments),
+              this.w.apply(this, [ dx, dy ]));
+          },
+          ne: function(dx, dy) {
+            return angular.extend(this.n.apply(this, arguments),
+              this.e.apply(this, [ dx, dy ]));
+          },
+          nw: function(dx, dy) {
+            return angular.extend(this.n.apply(this, arguments),
+              this.w.apply(this, [ dx, dy ]));
+          }
+        };
+
+        return _change[this._axis](dx, dy);
+      };
+
+      /**
+       * Updates incoming data to fit ratio.
+       *
+       * @param data - boundaries data. 
+       */
+      ResizableFactory.prototype.updateRatio = function(data) {
+        if (angular.isNumber(data.height)) {
+          data.width = (data.height * this._ratio);
+        } else if (angular.isNumber(data.width)) {
+          data.height = (data.width / this._ratio);
+        }
+
+        if (this._axis === 'sw') {
+          data.left = this._position.left + (this._size.width - data.width);
+          data.top = null;
+        }
+        if (this._axis === 'nw') {
+          data.top = this._position.top + (this._size.height - data.height);
+          data.left = this._position.left + (this._size.width - data.width);
+        }
+
+        return data;
+      };
+
+      /**
+       * Updates current position and size from boundaries data.
+       *
+       * @param data - boundaries data. 
+       */
+      ResizableFactory.prototype.updateSizeAndPosition = function(data) {
+        if (angular.isNumber(data.left)) {
+          this._position.left = data.left;
+        }
+        if (angular.isNumber(data.top)) {
+          this._position.top = data.top;
+        }
+        if (angular.isNumber(data.height)) {
+          this._size.height = data.height;
+        }
+        if (angular.isNumber(data.width)) {
+          this._size.width = data.width;
+        }
+      };
+
+      /**
+       * Calculates new virtual boundaries values depends on options and ratio.
+       */
+      ResizableFactory.prototype.updateVirtualBoundaries = function() {
+        var pMinWidth, pMaxWidth, pMinHeight, pMaxHeight, b,
+            o = this._options;
+
+        b = {
+          minWidth: angular.isNumber(o.minWidth) ? o.minWidth : 0,
+          maxWidth: angular.isNumber(o.maxWidth) ? o.maxWidth : Infinity,
+          minHeight: angular.isNumber(o.minHeight) ? o.minHeight : 0,
+          maxHeight: angular.isNumber(o.maxHeight) ? o.maxHeight : Infinity
+        };
+
+        if (this._ratio) {
+          pMinWidth = b.minHeight * this._ratio;
+          pMinHeight = b.minWidth / this._ratio;
+          pMaxWidth = b.maxHeight * this._ratio;
+          pMaxHeight = b.maxWidth / this._ratio;
+
+          if (pMinWidth > b.minWidth) {
+            b.minWidth = pMinWidth;
+          }
+          if (pMinHeight > b.minHeight) {
+            b.minHeight = pMinHeight;
+          }
+          if (pMaxWidth < b.maxWidth) {
+            b.maxWidth = pMaxWidth;
+          }
+          if (pMaxHeight < b.maxHeight) {
+            b.maxHeight = pMaxHeight;
+          }
+        }
+
+        this._vBoundaries = b;
+      };
+
+      /**
+       * Updates boundaries data to fit min/max sizes.
+       *
+       * @param data - boundaries data. 
+       */
+      ResizableFactory.prototype.respectSize = function(data) {
+        var o = this._vBoundaries,
+            a = this._axis,
+            ismaxw = angular.isNumber(data.width) && o.maxWidth && (o.maxWidth < data.width),
+            ismaxh = angular.isNumber(data.height) && o.maxHeight && (o.maxHeight < data.height),
+            isminw = angular.isNumber(data.width) && o.minWidth && (o.minWidth > data.width),
+            isminh = angular.isNumber(data.height) && o.minHeight && (o.minHeight > data.height),
+            dw = this._originalPosition.left + this._originalSize.width,
+            dh = this._position.top + this._size.height,
+            cw = /sw|nw|w/.test(a), ch = /nw|ne|n/.test(a);
+
+        if (isminw) {
+          data.width = o.minWidth;
+        }
+        if (isminh) {
+          data.height = o.minHeight;
+        }
+        if (ismaxw) {
+          data.width = o.maxWidth;
+        }
+        if (ismaxh) {
+          data.height = o.maxHeight;
+        }
+
+        if (isminw && cw) {
+          data.left = dw - o.minWidth;
+        }
+        if (ismaxw && cw) {
+          data.left = dw - o.maxWidth;
+        }
+        if (isminh && ch) {
+          data.top = dh - o.minHeight;
+        }
+        if (ismaxh && ch) {
+          data.top = dh - o.maxHeight;
+        }
+
+        if (!data.width && !data.height && !data.left && data.top) {
+          data.top = null;
+        } else if (!data.width && !data.height && !data.top && data.left) {
+          data.left = null;
+        }
+
+        return data;
+      };
+
+      /**
+       * Updates boundary data to avoid moving outside parent.
+       *
+       * @param data - boundaries data. 
+       */
+      ResizableFactory.prototype.fitContainer = function(data) {
+        var continueResize = true;
+
+        if (this._position.left < 0) {
+          // If left value is negative, we need to decrease width
+          // on this value and set left to zero.
+          this._size.width += this._position.left;
+
+          // Remember the height.
+          var h = this._size.height;
+          if ( this._ratio ) {
+            this._size.height = this._size.width / this._ratio;
+            continueResize = false;
+          }
+          this._position.left = 0;
+
+          if (this._axis === 'nw') {
+            // In case if both top and left was changed at the same time
+            // change top position also  by heights difference.
+            this._position.top += h - this._size.height;
+          }
+        } 
+
+        if ( this._position.top < 0 ) {
+          // If top value is negative, we need to decrease height
+          // on this value and set top to zero.
+          this._size.height += this._position.top;
+
+          // Remember the width.
+          var w = this._size.width;
+          if ( this._ratio ) {
+            this._size.width = this._size.height * this._ratio;
+            continueResize = false;
+          }
+          this._position.top = 0;
+
+          if (this._axis === 'nw') {
+            // In case if both top and left was changed at the same time
+            // change left position also by widths difference.
+            this._position.left += w - this._size.width;
+          }
+        }
+
+        // Too big width case.
+        if ( this._position.left + this._size.width >= this._parentData.width ) {
+          this._size.width = this._parentData.width - this._position.left;
+
+          var h = this._size.height;
+          if ( this._ratio ) {
+            this._size.height = this._size.width / this._ratio;
+            continueResize = false;
+          }
+
+          if (this._axis === 'ne' || this._axis === 'n') {
+            this._position.top += h - this._size.height; 
+          }
+        }
+
+        // Too big height case.
+        if ( this._position.top + this._size.height >= this._parentData.height ) {
+          this._size.height = this._parentData.height - this._position.top;
+
+          var w = this._size.width;
+          if ( this._ratio ) {
+            this._size.width = this._size.height * this._ratio;
+            continueResize = false;
+          }
+
+          if (this._axis === 'sw') {
+            this._position.left += w - this._size.width;
+          }
+        }
+
+        if ( !continueResize ) {
+          data.left = this._position.left;
+          data.top = this._position.top;
+          data.width = this._size.width;
+          data.height = this._size.height;
+        }
+
+        return data;
+      };
+
+      /**
+       * Getters / setters.
+       */
+      ResizableFactory.prototype.setOriginalSize = function(element) {
+        this._originalSize = {
+          width: parseInt(element.css('width'), 10) || element[0].clientWidth,
+          height: parseInt(element.css('height'), 10) || element[0].clientHeight
+        };
+
+        // Updating original size should update _size value.
+        this._size = angular.copy(this._originalSize);
+
+        return this;
+      }
+
+      ResizableFactory.prototype.getOriginalSize = function() {
+        return this._originalSize;
+      }
+
+      ResizableFactory.prototype.setParentSize = function(parentElement) {
+        this._parentData = { 
+          width: parseInt(parentElement.css('width'), 10) || parentElement[0].clientWidth,
+          height: parseInt(parentElement.css('height'), 10) || parentElement[0].clientHeight
+        };
+
+        return this;
+      }
+
+      ResizableFactory.prototype.getParentSize = function() {
+        return this._parentData;
+      }      
+
+      ResizableFactory.prototype.setOriginalPosition = function(top, left) {
+        this._originalPosition = { top: top, left: left };
+
+        // Updating original position should update _position value.
+        this._position = angular.copy(this._originalPosition);
+
+        return this;
+      }
+
+      ResizableFactory.prototype.getOriginalPosition = function() {
+        return this._originalPosition;
+      } 
+
+      ResizableFactory.prototype.setOriginalMousePosition = function(top, left) {
+        this._originalMousePosition = { top: top, left: left };
+
+        return this;
+      }
+
+      ResizableFactory.prototype.getOriginalMousePosition = function() {
+        return this._originalMousePosition;
+      } 
+
+      ResizableFactory.prototype.setOption = function(name, value) {
+        this._options[name] = value;
+
+        return this;
+      }
+
+      ResizableFactory.prototype.getOption = function(name) {
+        return this._options[name];
+      }
+
+      ResizableFactory.prototype.getSize = function() {
+        return this._size;
+      }
+
+      ResizableFactory.prototype.getPosition = function() {
+        return this._position;
+      }
+
+      ResizableFactory.prototype.getRatio = function() {
+        return this._ratio;
+      }
+
+      ResizableFactory.prototype.getAxis = function() {
+        return this._axis;
+      }
+
+      ResizableFactory.prototype.getVirtualBoundaries = function() {
+        return this._vBoundaries;
+      }
+
+      return ResizableFactory;
+    }).
+    controller('ResizableController', function($scope, $document, $rootScope, ResizableFactory) {
+      $scope.resizableFactory = new ResizableFactory({
+        minHeight: 20,
+        minWidth: 20
+      });
+
+      $scope.resizableUiParams = function() {
+        return {
+          element: $scope.element,
+          position: $scope.resizableFactory.getPosition(),
+          size: $scope.resizableFactory.getSize()
+        };
+      }
+
+      $scope.resizableHandleMousedown = function(event) {
+        // Prevent default dragging of selected content.
+        event.preventDefault();
+        // Stop propagation to parent from handlers.
+        event.stopPropagation();
+
+        $scope.resizableFactory.resizeStart(event, $scope.element);
+
+        // Bind events to track resize.
+        $document.on('mousemove', $scope.resizableMousemove);
+        $document.on('mouseup', $scope.resizableMouseup);
+
+        if (angular.isFunction($scope.resizeStart)) {
+          $scope.resizeStart(event, $scope.uiParams());
+        }
+      };
+
+      $scope.resizableMousemove = function(event) {
+        // Get new boundaries. 
+        var boundaryData = $scope.resizableFactory.getBoundaryData(event.screenX, event.screenY);
+
+        // And apply css.
+        var css = {};
+        angular.forEach(boundaryData, function(value, key) {
+          if (value !== null) {
+            css[key] = value + 'px';
+          }
+        });
+        $scope.element.css(css);
+      };
+
+      $scope.resizableMouseup = function(event) {
+        // Unbind events that track resize.
+        $document.unbind('mousemove', $scope.resizableMousemove);
+        $document.unbind('mouseup', $scope.resizableMouseup);
+
+        if (angular.isFunction($scope.resizeStop)) {
+          $scope.resizeStop(event, $scope.uiParams());
+        }
+        $rootScope.$broadcast('resizeStop', event, $scope.resizableUiParams());
+      };
+    }).
+    directive('resizable', function($document) {
+      return {
+        restrict: 'A',
+        // scope: {
+        //   resizeStart: '&',
+        //   resizeStop: '&'
+        // },
+        controller: 'ResizableController',
+        link: function(scope, element, attr) {
+          scope.element = element;
+          scope.parentElement = element.parent();
+
+          // Element should have absolute position.
+          element.css({ position: 'absolute' });
+
+          // Add dragging handlers.
+          var handlers = 'n,e,w,s,nw,ne,sw,se';
+          handlers.split(',').forEach(function(direction) {
+            var handler = angular.element('<span class="resizable-'+direction+' resizable-handle"></span>');
+            element.append(handler);
+            handler.on('mousedown', function(event) {
+              scope.resizableHandleMousedown(event);
+            });
+          });
+        }
+      };
+    });
+}());
+
+
+
+(function () {
+        angular.module('pmImageEditor')
+        .factory('ImageEditorFactory', function () {
+            var ImageEditorFactory = function() {
+                this.image = null;
+
+                // Visible area width. Image should always fit width to this area.
+                this.visibleWidth = 0;
+
+                this.ratio = 1;
+                this.rotation = 0;
+
+                // Current width and height.
+                this.width = 0;
+                this.height = 0;
+
+                // Coordinates of top-left corner.
+                this.top = 0;
+                this.left = 0;
+
+                this.selection = null;
+                this.isCropped = false;
+            }
+
+            /**
+             * Return css based on curent image data.
+             */
+            ImageEditorFactory.prototype.css = function() {
+                return {
+                    position: 'absolute',
+                    top: this.top+'px',
+                    left: this.left+'px',
+                    width: this.width+'px',
+                    height: this.height+'px',
+                    transform: this.rotation ? 'rotate('+90*this.rotation+'deg)' : 'none'
+                }
+            }
+
+            ImageEditorFactory.prototype.parentSize = function() {
+                var r = this.isCropped ? this.selection.ratio : this.ratio;
+                var w = this.visibleWidth;
+
+                return {
+                    width: w,
+                    height: (this.rotation % 2 === 0 ? w/r : w*r)
+                };
+            }
+
+            /**
+             * Return parent css based on curent image data.
+             */
+            ImageEditorFactory.prototype.parentCss = function() {
+                var s = this.parentSize();
+
+                return {
+                    width: s.width+'px',
+                    height: s.height+'px'
+                }
+            }
+
+            ImageEditorFactory.prototype.initImageData = function(naturalWidth, naturalHeight) {
+                this.ratio = naturalWidth/naturalHeight;
+
+                // Initially image should fit visible area.
+                this.width = this.visibleWidth;
+                this.height = this.width/this.ratio;
+
+                // Top-left corner should be at top-left corner.
+                this.top = 0;
+                this.left = 0;
+
+                this.isCropped = false;
+            }
+
+            ImageEditorFactory.prototype.setVisibleWidth = function(visibleWidth) {
+                this.visibleWidth = parseInt(visibleWidth, 10);
+
+                return this;
+            }
+
+            ImageEditorFactory.prototype.setSelection = function(selection) {
+                this.selection = selection;
+                this.selection.ratio = selection.width/selection.height;
+
+                console.log(this.selection);
+
+                return this;
+            }
+
+            ImageEditorFactory.prototype.crop = function() {
+                var s = this.selection;
+                var r = this.visibleWidth/s.width;
+
+                this.top = (this.top - s.top)*r;
+                this.left = (this.left - s.left)*r;
+                this.width = this.width*r;
+                this.height = this.width/this.ratio;
+
+                this.isCropped = true;
+
+                return this;
+            }
+
+            ImageEditorFactory.prototype.rotate = function(dir) {
+                var ps = this.parentSize();
+
+                this.rotation += dir === 'cw' ? 1 : -1;
+
+                var d0 = (this.width - this.height)/2;
+
+                var r = this.visibleWidth/ps.height;
+                this.height = this.height*r;
+                this.width = this.height*this.ratio;
+
+                //if (this.rotation%2) {
+                    var d = (this.width - this.height)/2;
+                    this.left -= this.rotation%2 ? d : -d0; 
+                    this.top += this.rotation%2 ? d : -d0; 
+                //}
+
+console.log(this.rotation%2, r);
+
+                // this._image.css({
+                //     //'transform-origin': '0 0',
+                //     'margin-left': (-d)+'px',
+                //     'margin-top': (d)+'px',
+                //     'width': (pw*r)+'px',
+                //     'height': (ph*r)+'px'
+                // });
+            }
+
+            return ImageEditorFactory;
+        })
+        .controller('ImageEditorController', function($scope, ImageEditorFactory) {
+            $scope.editor = new ImageEditorFactory();
+        })
+        .directive('imageEditor', ['$timeout', function ($timeout) {
+            return {
+                restrict: 'E',
+                scope: {
+                    image: '=',
+                    width: '@',
+                    selectionWidth: '@',
+                    selectionHeight: '@'
+                },
+                controller: 'ImageEditorController',
+                template: '\
+                    <div class="image-editor-canvas">\
+                        <img src="{{image}}" />\
+                        <image-selection width="{{selectionWidth}}" height="{{selectionHeight}}" draggable resizable></image-selection>\
+                    </div>\
+                    <editor-panel></editor-panel>',
+                link: function (scope, element) {
+                    var image = element.find('img');
+
+                    // Set initial selection.
+                    scope.editor.setSelection({
+                        top: 0,
+                        left: 0,
+                        width: scope.selectionWidth,
+                        height: scope.selectionHeight
+                    });
+
+                    scope.editor.setVisibleWidth(scope.width);
+
+                    image[0].onload = function() {
+                        scope.editor.initImageData(this.naturalWidth, this.naturalHeight);
+                        image.css(scope.editor.css());
+                        image.parent().css(scope.editor.parentCss());
+                    }
+
+                    scope.$on('editorButtonClick', function(event, args) {
+                        event.stopPropagation();
+
+                        console.log(args.name);
+
+                        switch (args.name) {
+                            case 'crop':
+                                scope.editor.crop();
+                                break;
+
+                            case 'rotate-cw':
+                                scope.editor.rotate('cw');
+                                break;
+
+                            case 'rotate-acw':
+                                scope.editor.rotate('acw');
+                                break;
+                        }
+console.log(scope.editor.css());
+                        image.css(scope.editor.css());
+                        image.parent().css(scope.editor.parentCss());
+                    });
+
+                    scope.$on('selectionChanged', function(event, args) {
+                        event.stopPropagation();
+
+                        scope.editor.setSelection(args);
+                    });
+
+                    scope.$watch('image', function(value) {
+                        //scope.editor.setImage(element.find('img'));
+                    });
+                }
+            };
+        }]);
 }());
 }());
