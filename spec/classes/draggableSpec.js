@@ -5,8 +5,101 @@ describe('Draggable', function () {
         module('pmImageEditor');
     });
 
+    describe('factory', function() {
+        var factory,
+            element,
+            event,
+            parent;
+
+        beforeEach(inject(function (DraggableFactory) {
+            factory = new DraggableFactory();
+
+            element = angular.element('<div></div>');
+            parent = angular.element('<div></div>');
+
+            parent.append(element);
+
+            element.css({width: '60px', height: '50px'});
+            parent.css({width: '500px', height: '600px'});
+
+            event = {
+                screenX: 10,
+                screenY: 20
+            };
+        }));
+
+        it('should return correct css', function() {
+            expect(factory.css()).toEqual({top: '0px', left: '0px'});
+
+            factory.setPosition(1, 2);
+
+            expect(factory.css()).toEqual({top: '1px', left: '2px'});
+        });
+
+        it('should update all required data when drag starts with zero top-left', function() {
+            factory.dragStart(event, element, parent);
+
+            expect(factory.getPosition()).toEqual({top: 0, left: 0});
+            expect(factory.getOriginalMousePosition()).toEqual({top: 20, left: 10});
+            expect(factory.getSize()).toEqual({width: 60, height: 50});
+            expect(factory.getParentSize()).toEqual({width: 500, height: 600});
+        });
+
+        it('should update all required data when drag starts', function() {
+            element.css({top: '100px', left: '200px'});
+            factory.dragStart(event, element, parent);
+
+            expect(factory.getPosition()).toEqual({top: 100, left: 200});
+            expect(factory.getOriginalMousePosition()).toEqual({top: 20-100, left: 10-200});
+            expect(factory.getSize()).toEqual({width: 60, height: 50});
+            expect(factory.getParentSize()).toEqual({width: 500, height: 600});
+        });
+
+        describe('should update position', function() {
+            beforeEach(function() {
+                event = {
+                    screenX: 0,
+                    screenY: 0
+                };
+
+                factory.dragStart(event, element, parent);
+            });
+
+            it('correctly', function() {
+                factory.updatePosition(10, 20);
+
+                expect(factory.getPosition()).toEqual({top: 10, left: 20});
+            });
+
+            it('and avoid negative position', function() {
+                factory.updatePosition(-10, -5);
+
+                expect(factory.getPosition()).toEqual({top: 0, left: 0});
+            });
+
+            it('and be limited with parent element', function() {
+                factory.updatePosition(560, 460);
+
+                expect(factory.getPosition()).toEqual({top: 550, left: 440});
+            });
+        });
+
+        it('should extract size from real size if css missed', function() {
+            factory.setSize({0: {clientWidth: 100, clientHeight: 200}, css: function() {}});
+
+            expect(factory.getSize()).toEqual({width: 100, height: 200});
+        });  
+
+        it('should extract parent size from real size if css missed', function() {
+            factory.setParentSize({0: {clientWidth: 100, clientHeight: 200}, css: function() {}});
+
+            expect(factory.getParentSize()).toEqual({width: 100, height: 200});
+        });
+    });
+
     describe('controller', function() {
         var ctrl,
+            rootScope,
             scope,
             document,
             createCtrl;
@@ -15,37 +108,33 @@ describe('Draggable', function () {
             scope = $rootScope.$new();
             ctrl = $controller;
             document = _$document_;
+            rootScope = $rootScope;
 
             createCtrl = function() {
                 ctrl('DraggableController', {
                     '$scope': scope,
-                    '$document': document
+                    '$document': document,
+                    '$rootScope': rootScope
                 });
             };
         }));
 
-        it('should have initial values', function() {
+        it('should create draggable factory instance', function() {
             createCtrl();
 
-            expect(scope.startX).toBe(0);
-            expect(scope.startY).toBe(0);
-            expect(scope.x).toBe(0);
-            expect(scope.y).toBe(0);
+            expect(scope.draggableFactory).toBeDefined();
         });   
 
-        it('should return correct uiParams', function() {
+        it('should return correct draggableUiParams', function() {
             createCtrl();
 
-            scope.x = 1;
-            scope.y = 2;
+            scope.draggableFactory.setPosition(10, 20);
+
             scope.element = {};
 
-            expect(scope.uiParams()).toEqual({
+            expect(scope.draggableUiParams()).toEqual({
                 element: {},
-                position: {
-                    top: 2,
-                    left: 1
-                }
+                position: { top: 10, left: 20 }
             });
         }); 
 
@@ -60,37 +149,19 @@ describe('Draggable', function () {
 
             createCtrl();
 
-            scope.element = angular.element('<div/>');
+            spyOn(scope.draggableFactory, 'dragStart');
 
-            scope.mousedown(event);
+            scope.element = 1;
+            scope.parentElement = 2;
+
+            scope.draggableMousedown(event);
 
             expect(event.preventDefault).toHaveBeenCalled();
-
-            expect(scope.startX).toBe(10);
-            expect(scope.startY).toBe(20);
+            expect(scope.draggableFactory.dragStart).toHaveBeenCalledWith(event, 1, 2);
 
             expect(document.on.calls.count()).toBe(2);
-            expect(document.on.calls.argsFor(0)).toEqual(['mousemove', jasmine.any(Function)]);
-            expect(document.on.calls.argsFor(1)).toEqual(['mouseup', jasmine.any(Function)]);        
-
-        });
-
-        it('should call scope.dragStart function if mousedown called', function() {
-            var event = {
-                preventDefault: jasmine.createSpy('preventDefault'),
-                screenX: 10,
-                screenY: 20
-            };
-
-            scope.dragStart = jasmine.createSpy('start');
-
-            scope.element = angular.element('<div/>');
-            
-            createCtrl();
-
-            scope.mousedown(event);
-
-            expect(scope.dragStart).toHaveBeenCalled();
+            expect(document.on.calls.argsFor(0)).toEqual(['mousemove', scope.draggableMousemove]);
+            expect(document.on.calls.argsFor(1)).toEqual(['mouseup', scope.draggableMouseup]);
         });
 
         it('should unbind document events if mouseup called', function() {
@@ -98,83 +169,40 @@ describe('Draggable', function () {
 
             createCtrl();
 
-            scope.mouseup();
+            scope.draggableMouseup();
 
             expect(document.unbind.calls.count()).toBe(2);
-            expect(document.unbind.calls.argsFor(0)).toEqual(['mousemove', jasmine.any(Function)]);
-            expect(document.unbind.calls.argsFor(1)).toEqual(['mouseup', jasmine.any(Function)]);        
+            expect(document.unbind.calls.argsFor(0)).toEqual(['mousemove', scope.draggableMousemove]);
+            expect(document.unbind.calls.argsFor(1)).toEqual(['mouseup', scope.draggableMouseup]);
         });
 
-        it('should call scope.dragStop function if mouseup called', function() {
-            scope.dragStop = jasmine.createSpy('stop');
+        it('should broadcast dragStop event if mouseup called', function() {
+            spyOn(rootScope, '$broadcast');
 
             createCtrl();
 
-            scope.mouseup();
+            scope.draggableMouseup();
 
-            expect(scope.dragStop).toHaveBeenCalled();
-        });        
+            expect(rootScope.$broadcast).toHaveBeenCalledWith('dragStop', event, scope.draggableUiParams());
+        });
 
-        describe('should update element position if mousemove called', function() {
-            beforeEach(function () {
-                scope.element = {
-                    0: {
-                        clientWidth: 50,
-                        clientHeight: 50
-                    },
-                    css: jasmine.createSpy('css')
-                };
+        it('should update element position if mousemove called', function() {
+            var event = {
+                screenX: 10,
+                screenY: 20
+            };
 
-                scope.parentElement = [{
-                    clientWidth: 150,
-                    clientHeight: 100
-                }];
+            createCtrl();
 
-                createCtrl();
-            });
+            scope.element = {css: jasmine.createSpy('css')};
 
-            it('correctly', function() {
-                var event = {
-                    screenX: 10,
-                    screenY: 20
-                };
+            spyOn(scope.draggableFactory, 'updatePosition');
+            spyOn(scope.draggableFactory, 'css').and.returnValue({top: '1px', left: '2px'});
 
-                scope.mousemove(event);
+            scope.draggableMousemove(event);
 
-                expect(scope.element.css).toHaveBeenCalledWith({
-                    top: '20px',
-                    left: '10px'
-                });
-            });
-
-            it('and avoid negative position', function() {
-                var event = {
-                    screenX: -10,
-                    screenY: -20
-                };
-
-                scope.mousemove(event);
-
-                expect(scope.element.css).toHaveBeenCalledWith({
-                    top: '0px',
-                    left: '0px'
-                });
-            });
-
-            it('and be limited with parent element', function() {
-                var event = {
-                    screenX: 120,
-                    screenY: 120
-                };
-
-                scope.mousemove(event);
-
-                expect(scope.element.css).toHaveBeenCalledWith({
-                    top: '50px',
-                    left: '100px'
-                });
-            });
-
+            expect(scope.draggableFactory.updatePosition).toHaveBeenCalledWith(20, 10);
+            expect(scope.element.css).toHaveBeenCalledWith({top: '1px', left: '2px'});
         });
     });
 
@@ -196,11 +224,11 @@ describe('Draggable', function () {
         });
 
         it('should call mousedown from scope if event happens', function() {
-            spyOn(scope, 'mousedown');
+            spyOn(scope, 'draggableMousedown');
 
             scope.element.triggerHandler('mousedown');
 
-            expect(scope.mousedown).toHaveBeenCalled();
-        });        
+            expect(scope.draggableMousedown).toHaveBeenCalled();
+        });
     });
 });
