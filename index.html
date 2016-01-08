@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html ng-app="app">
+<head>
+  <title>ngImgCrop Test Page</title>
+  <script src="js/angular.min.js"></script>
+  <script type="text/javascript" src="js/pm-image-editor.js"></script>
+  <link rel="stylesheet" href="css/pm-image-editor.css"/>
+  <style>
+    .cropArea {
+      /*background: #E4E4E4;*/
+      margin: auto;
+      overflow: hidden;
+    }
+    .cropArea.big {
+      width:800px;
+      height:650px;
+    }
+    .cropArea.medium {
+      width:500px;
+      height:400px;
+    }
+    .cropArea.small {
+      width:300px;
+      /*height:250px;*/
+    }
+  </style>
+</head>
+<body ng-controller="Ctrl">
+  <div class="cropArea" ng-class="{'big':size=='big', 'medium':size=='medium', 'small':size=='small'}">
+    <image-editor image="'test.jpg'"
+                  width="300"
+                  selection-width="100"
+                  selection-height="75"
+    ></image-editor>
+  </div>
+
+  <script type="text/javascript">
+    angular.module('app', ['pmImageEditor'])
+      .controller('Ctrl', function($scope) {
+        $scope.size='small';
+        $scope.type='circle';
+        $scope.imageDataURI='';
+        $scope.resImageDataURI='';
+        $scope.resImgFormat='image/png';
+        $scope.resImgQuality=1;
+        $scope.selMinSize=100;
+        $scope.resImgSize=200;
+        //$scope.aspectRatio=1.2;
+        $scope.onChange=function($dataURI) {
+          console.log('onChange fired');
+        };
+        $scope.onLoadBegin=function() {
+          console.log('onLoadBegin fired');
+        };
+        $scope.onLoadDone=function() {
+          console.log('onLoadDone fired');
+        };
+        $scope.onLoadError=function() {
+          console.log('onLoadError fired');
+        };
+        var handleFileSelect=function(evt) {
+          var file=evt.currentTarget.files[0];
+          var reader = new FileReader();
+          reader.onload = function (evt) {
+            $scope.$apply(function($scope){
+              $scope.imageDataURI=evt.target.result;
+            });
+          };
+          reader.readAsDataURL(file);
+        };
+        angular.element(document.querySelector('#fileInput')).on('change',handleFileSelect);
+        $scope.$watch('resImageDataURI',function(){
+          //console.log('Res image', $scope.resImageDataURI);
+        });
+      });
+  </script>
+</body>
+</html>
