@@ -5,7 +5,7 @@
  * Copyright (c) 2016 Partnermarketing.com
  * License: MIT
  *
- * Generated at Friday, January 8th, 2016, 1:44:25 PM
+ * Generated at Friday, January 8th, 2016, 7:25:50 PM
  */
 (function() {
 'use strict';
@@ -1834,81 +1834,153 @@
 
 (function () {
   angular.module('pmImageEditor').
-    controller('DraggableController', function($scope, $document, $rootScope) {
-      // Start X and Y position of the draggable element.
-      $scope.startX = 0;
-      $scope.startY = 0;
+    factory('DraggableFactory', function() {
+      var DraggableFactory = function() {
+        this._originalMousePosition = { top: 0, left: 0 };
+        this._position = { top: 0, left: 0 };
 
-      // Coordinates of the top-left corner of draggable element.
-      $scope.x = 0;
-      $scope.y = 0;
+        this._size = { width: 0, height: 0 };
+        this._parentSize = { width: 0, height: 0 };
+      };
+
+      /**
+       * Return css that is a result of dragging.
+       */
+      DraggableFactory.prototype.css = function() {
+        return {
+          top: this._position.top+'px',
+          left: this._position.left+'px'
+        }
+      }
+
+      /**
+       * Set start data of the draggable element.
+       *
+       * @param event - native event which happens on mouse down for element.
+       * @param element - draggable element.
+       * @param parentElement - draggable element parent.
+       */
+      DraggableFactory.prototype.dragStart = function(event, element, parentElement) {
+        this
+          .setPosition(
+            parseInt(element.css('top'), 10) || 0,
+            parseInt(element.css('left'), 10) || 0
+          )
+          .setOriginalMousePosition(event.screenY, event.screenX)
+          .setSize(element)
+          .setParentSize(parentElement);
+
+        return this;
+      }
+
+      /**
+       * Update position of draggable element.
+       * Doublecheck that element is not go out of parent element borders.
+       */
+      DraggableFactory.prototype.updatePosition = function(top, left) {
+        // Calculate new top-left position and check that it stays positive.
+        this._position.top = Math.max(top - this._originalMousePosition.top, 0);
+        this._position.left = Math.max(left - this._originalMousePosition.left, 0);
+
+        // Doublecheck that new x and y is not go out from parent borders.
+        if (this._position.left + this._size.width > this._parentSize.width) {
+          this._position.left = this._parentSize.width - this._size.width;
+        }
+
+        if (this._position.top + this._size.height > this._parentSize.height) {
+          this._position.top = this._parentSize.height - this._size.height;
+        }
+
+        return this;
+      }
+
+      /** Getters/setters */
+      DraggableFactory.prototype.setPosition = function(top, left) {
+        this._position = { top: top, left: left };
+
+        return this;
+      }
+
+      DraggableFactory.prototype.getPosition = function() {
+        return this._position;
+      }
+
+      DraggableFactory.prototype.setOriginalMousePosition = function(top, left) {
+        this._originalMousePosition = {
+          top: top - this._position.top,
+          left: left - this._position.left
+        };
+
+        return this;
+      }
+
+      DraggableFactory.prototype.getOriginalMousePosition = function() {
+        return this._originalMousePosition;
+      }
+
+      DraggableFactory.prototype.setSize = function(element) {
+        this._size = {
+          width: parseInt(element.css('width'), 10) || element[0].clientWidth,
+          height: parseInt(element.css('height'), 10) || element[0].clientHeight
+        };
+
+        return this;
+      }
+
+      DraggableFactory.prototype.getSize = function() {
+        return this._size;
+      }
+
+      DraggableFactory.prototype.setParentSize = function(parentElement) {
+        this._parentSize = { 
+          width: parseInt(parentElement.css('width'), 10) || parentElement[0].clientWidth,
+          height: parseInt(parentElement.css('height'), 10) || parentElement[0].clientHeight
+        };
+
+        return this;
+      }
+
+      DraggableFactory.prototype.getParentSize = function() {
+        return this._parentSize;
+      }
+
+      return DraggableFactory;
+    }).
+    controller('DraggableController', function($scope, $document, $rootScope, DraggableFactory) {
+      $scope.draggableFactory = new DraggableFactory();
 
       $scope.draggableUiParams = function() {
         return {
           element: $scope.element,
-          position: {
-            top: $scope.y,
-            left:  $scope.x
-          }
+          position: $scope.draggableFactory.getPosition()
         };
       }
 
-      $scope.mousedown = function(event) {
+      $scope.draggableMousedown = function(event) {
         // Prevent default dragging of selected content.
         event.preventDefault();
 
-        $scope.x = parseInt($scope.element.css('left'), 10) || 0; 
-        $scope.y = parseInt($scope.element.css('top'), 10) || 0; 
-
-        // Remember start position for top-left corner of the element.
-        $scope.startX = event.screenX - $scope.x;
-        $scope.startY = event.screenY - $scope.y;
+        $scope.draggableFactory.dragStart(event, $scope.element, $scope.parentElement);
 
         // Bind events to track drag.
-        $document.on('mousemove', $scope.mousemove);
-        $document.on('mouseup', $scope.mouseup);
-
-        if (angular.isFunction($scope.dragStart)) {
-          $scope.dragStart(event, $scope.draggableUiParams());
-        }
+        $document.on('mousemove', $scope.draggableMousemove);
+        $document.on('mouseup', $scope.draggableMouseup);
       };
 
-      $scope.mousemove = function(event) {
-        var elementWidth = parseInt($scope.element.css('width'), 10) || $scope.element[0].clientWidth,
-            elementHeight = parseInt($scope.element.css('height'), 10) || $scope.element[0].clientHeight,
-            parentWidth = $scope.parentElement[0].clientWidth,
-            parentHeight = $scope.parentElement[0].clientHeight;
-
-          // Calculate new top-left position and check that it stays positive.
-          $scope.y = Math.max(event.screenY - $scope.startY, 0);
-          $scope.x = Math.max(event.screenX - $scope.startX, 0);
-
-          // Doublecheck that new x and y is not go out from parent borders.
-          if ($scope.x + elementWidth > parentWidth) {
-            $scope.x = parentWidth - elementWidth;
-          }
-
-          if ($scope.y + elementHeight > parentHeight) {
-            $scope.y = parentHeight - elementHeight;
-          }          
+      $scope.draggableMousemove = function(event) {
+        $scope.draggableFactory.updatePosition(event.screenY, event.screenX);
 
           // Set new element position.
-          $scope.element.css({
-            top: $scope.y + 'px',
-            left:  $scope.x + 'px'
-          });
-        };
+        $scope.element.css($scope.draggableFactory.css());
+      };
 
-        $scope.mouseup = function(event) {
-          // Unbind events that track drag.
-          $document.unbind('mousemove', $scope.mousemove);
-          $document.unbind('mouseup', $scope.mouseup);
+      $scope.draggableMouseup = function(event) {
+        // Unbind events that track drag.
+        $document.unbind('mousemove', $scope.draggableMousemove);
+        $document.unbind('mouseup', $scope.draggableMouseup);
 
-          if (angular.isFunction($scope.dragStop)) {
-            $scope.dragStop(event, $scope.draggableUiParams());
-          }          
-          $rootScope.$broadcast('dragStop', event, $scope.draggableUiParams());
-        };
+        $rootScope.$broadcast('dragStop', event, $scope.draggableUiParams());
+      };
     }).
     directive('draggable', function($document) {
       return {
@@ -1921,7 +1993,7 @@
           element.css({ position: 'absolute' });
 
           element.on('mousedown', function(event) {
-            scope.mousedown(event);
+            scope.draggableMousedown(event);
           });
         }
       };
@@ -1937,7 +2009,7 @@
             scope: {
             },
             link: function (scope, element) {
-                var buttons = 'crop,rotate-cw,rotate-acw';
+                var buttons = 'crop,rotate-cw,rotate-acw,flip-h,flip-v,undo,redo';
                 buttons.split(',').forEach(function(name){
                     var button = angular.element('<span class="image-editor-'+name+'" />');
                     button.on('click', function() {
@@ -2440,10 +2512,6 @@
         // Bind events to track resize.
         $document.on('mousemove', $scope.resizableMousemove);
         $document.on('mouseup', $scope.resizableMouseup);
-
-        if (angular.isFunction($scope.resizeStart)) {
-          $scope.resizeStart(event, $scope.uiParams());
-        }
       };
 
       $scope.resizableMousemove = function(event) {
@@ -2465,9 +2533,6 @@
         $document.unbind('mousemove', $scope.resizableMousemove);
         $document.unbind('mouseup', $scope.resizableMouseup);
 
-        if (angular.isFunction($scope.resizeStop)) {
-          $scope.resizeStop(event, $scope.uiParams());
-        }
         $rootScope.$broadcast('resizeStop', event, $scope.resizableUiParams());
       };
     }).
@@ -2524,19 +2589,35 @@
 
                 this.selection = null;
                 this.isCropped = false;
+
+                this.hFlip = false;
+                this.vFlip = false;
             }
 
             /**
              * Return css based on curent image data.
              */
             ImageEditorFactory.prototype.css = function() {
+                var transform = [];
+                if (this.rotation) {
+                    transform.push('rotate('+90*this.rotation+'deg)');
+                }
+
+                if (this.vFlip) {
+                    transform.push('scaleX(-1)');
+                }
+
+                if (this.hFlip) {
+                    transform.push('scaleY(-1)');
+                }
+
                 return {
                     position: 'absolute',
                     top: this.top+'px',
                     left: this.left+'px',
                     width: this.width+'px',
                     height: this.height+'px',
-                    transform: this.rotation ? 'rotate('+90*this.rotation+'deg)' : 'none'
+                    transform: transform.length ? transform.join(' ') : 'none'
                 }
             }
 
@@ -2601,8 +2682,22 @@
                 this.height = this.width/this.ratio;
 
                 this.isCropped = true;
+            }
 
-                return this;
+            ImageEditorFactory.prototype.horizontalFlip = function() {
+                this.hFlip = !this.hFlip;
+
+                var s = this.parentSize();
+
+                this.top = s.height - this.height - this.top; 
+            }
+
+            ImageEditorFactory.prototype.verticalFlip = function() {
+                this.vFlip = !this.vFlip;
+
+                var s = this.parentSize();
+
+                this.left = s.width - this.width - this.left; 
             }
 
             ImageEditorFactory.prototype.rotate = function(dir) {
@@ -2690,8 +2785,18 @@ console.log(this.rotation%2, r);
                             case 'rotate-acw':
                                 scope.editor.rotate('acw');
                                 break;
+
+                            case 'flip-v':
+                                scope.editor.verticalFlip();
+                                break;
+
+                            case 'flip-h':
+                                scope.editor.horizontalFlip();
+                                break;
                         }
-console.log(scope.editor.css());
+
+                        console.log(scope.editor.css());
+
                         image.css(scope.editor.css());
                         image.parent().css(scope.editor.parentCss());
                     });
