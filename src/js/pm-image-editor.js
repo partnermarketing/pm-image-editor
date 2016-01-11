@@ -1,3 +1,4 @@
+/*jshint multistr: true */
 (function () {
     'use strict';
 
@@ -25,7 +26,7 @@
 
                 this.hFlip = false;
                 this.vFlip = false;
-            }
+            };
 
             /**
              * Return css based on curent image data.
@@ -51,8 +52,8 @@
                     width: this.width+'px',
                     height: this.height+'px',
                     transform: transform.length ? transform.join(' ') : 'none'
-                }
-            }
+                };
+            };
 
             ImageEditorFactory.prototype.parentSize = function() {
                 var r = this.isCropped ? this.selection.ratio : this.ratio;
@@ -62,7 +63,7 @@
                     width: w,
                     height: (this.rotation % 2 === 0 ? w/r : w*r)
                 };
-            }
+            };
 
 
             /**
@@ -74,8 +75,8 @@
                 return {
                     width: s.width+'px',
                     height: s.height+'px'
-                }
-            }
+                };
+            };
 
 
             ImageEditorFactory.prototype.initImageData = function(naturalWidth, naturalHeight) {
@@ -90,13 +91,13 @@
                 this.left = 0;
 
                 this.isCropped = false;
-            }
+            };
 
             ImageEditorFactory.prototype.setVisibleWidth = function(visibleWidth) {
                 this.visibleWidth = parseInt(visibleWidth, 10);
 
                 return this;
-            }
+            };
 
             ImageEditorFactory.prototype.setSelection = function(selection) {
                 this.selection = selection;
@@ -105,7 +106,7 @@
                 console.log(this.selection);
 
                 return this;
-            }
+            };
 
             ImageEditorFactory.prototype.crop = function() {
                 var s = this.selection;
@@ -117,7 +118,7 @@
                 this.height = this.width/this.ratio;
 
                 this.isCropped = true;
-            }
+            };
 
             ImageEditorFactory.prototype.horizontalFlip = function() {
                 this.hFlip = !this.hFlip;
@@ -125,7 +126,7 @@
                 var s = this.parentSize();
 
                 this.top = s.height - this.height - this.top; 
-            }
+            };
 
             ImageEditorFactory.prototype.verticalFlip = function() {
                 this.vFlip = !this.vFlip;
@@ -133,7 +134,7 @@
                 var s = this.parentSize();
 
                 this.left = s.width - this.width - this.left; 
-            }
+            };
 
 
             ImageEditorFactory.prototype.rotate = function(dir) {
@@ -165,7 +166,7 @@ console.log(this.rotation%2, r);
                 //     'width': (pw*r)+'px',
                 //     'height': (ph*r)+'px'
                 // });
-            }
+            };
 
 
 
@@ -174,7 +175,7 @@ console.log(this.rotation%2, r);
         .controller('ImageEditorController', function($scope, ImageEditorFactory) {
             $scope.editor = new ImageEditorFactory();
         })
-        .directive('imageEditor', ['$timeout', function ($timeout) {
+        .directive('imageEditor', function () {
             return {
                 restrict: 'E',
                 scope: {
@@ -207,7 +208,7 @@ console.log(this.rotation%2, r);
                         scope.editor.initImageData(this.naturalWidth, this.naturalHeight);
                         image.css(scope.editor.css());
                         image.parent().css(scope.editor.parentCss());
-                    }
+                    };
 
                     scope.$on('editorButtonClick', function(event, args) {
                         event.stopPropagation();
@@ -248,10 +249,10 @@ console.log(this.rotation%2, r);
                         scope.editor.setSelection(args);
                     });
 
-                    scope.$watch('image', function(value) {
+                    //scope.$watch('image', function(value) {
                         //scope.editor.setImage(element.find('img'));
-                    });
+                    //});
                 }
             };
-        }]);
+        });
 }());

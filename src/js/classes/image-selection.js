@@ -24,7 +24,7 @@
                         width: parseInt(element.css('width'), 10),
                         height: parseInt(element.css('height'), 10)
                     });
-                }
+                };
 
                 scope.$on('dragStop', function(e, event, ui) {
                     if (ui.element === element) {

@@ -1,4 +1,6 @@
 (function () {
+  'use strict';
+
   angular.module('pmImageEditor').
     factory('ResizableFactory', function() {
       var ResizableFactory = function(options) {
@@ -16,7 +18,7 @@
 
         this._axis = 'se';
         this._ratio = 1;
-      }
+      };
 
       /**
        * Updates necessary data when resize is starting.
@@ -25,7 +27,7 @@
        * @param element - resizable element.
        */
       ResizableFactory.prototype.resizeStart = function(event, element) {
-        this.setOriginalMousePosition(event.screenY, event.screenX)
+        this.setOriginalMousePosition(event.screenY, event.screenX);
 
         this.setOriginalPosition(parseInt(element.css('top'), 10) || 0, parseInt(element.css('left'), 10) || 0);
 
@@ -39,7 +41,7 @@
         this._axis = axis && axis[1] ? axis[1] : 'se';
 
         this.updateVirtualBoundaries();
-      }
+      };
 
       /**
        * Calculates new boundary data when handler moves to screenX and screenY.
@@ -60,7 +62,7 @@
         this.updateSizeAndPosition(boundaryData);
 
         return this.fitContainer(boundaryData);
-      }
+      };
 
       /**
        * Calculates boundary object to apply when mouse pointer position changes by dx, dy
@@ -251,6 +253,7 @@
        */
       ResizableFactory.prototype.fitContainer = function(data) {
         var continueResize = true;
+        var h, w;
 
         if (this._position.left < 0) {
           // If left value is negative, we need to decrease width
@@ -258,7 +261,7 @@
           this._size.width += this._position.left;
 
           // Remember the height.
-          var h = this._size.height;
+          h = this._size.height;
           if ( this._ratio ) {
             this._size.height = this._size.width / this._ratio;
             continueResize = false;
@@ -278,7 +281,7 @@
           this._size.height += this._position.top;
 
           // Remember the width.
-          var w = this._size.width;
+          w = this._size.width;
           if ( this._ratio ) {
             this._size.width = this._size.height * this._ratio;
             continueResize = false;
@@ -296,7 +299,7 @@
         if ( this._position.left + this._size.width >= this._parentData.width ) {
           this._size.width = this._parentData.width - this._position.left;
 
-          var h = this._size.height;
+          h = this._size.height;
           if ( this._ratio ) {
             this._size.height = this._size.width / this._ratio;
             continueResize = false;
@@ -311,7 +314,7 @@
         if ( this._position.top + this._size.height >= this._parentData.height ) {
           this._size.height = this._parentData.height - this._position.top;
 
-          var w = this._size.width;
+          w = this._size.width;
           if ( this._ratio ) {
             this._size.width = this._size.height * this._ratio;
             continueResize = false;
@@ -346,11 +349,11 @@
         this._size = angular.copy(this._originalSize);
 
         return this;
-      }
+      };
 
       ResizableFactory.prototype.getOriginalSize = function() {
         return this._originalSize;
-      }
+      };
 
       ResizableFactory.prototype.setParentSize = function(parentElement) {
         this._parentData = { 
@@ -359,11 +362,11 @@
         };
 
         return this;
-      }
+      };
 
       ResizableFactory.prototype.getParentSize = function() {
         return this._parentData;
-      }      
+      };
 
       ResizableFactory.prototype.setOriginalPosition = function(top, left) {
         this._originalPosition = { top: top, left: left };
@@ -372,51 +375,51 @@
         this._position = angular.copy(this._originalPosition);
 
         return this;
-      }
+      };
 
       ResizableFactory.prototype.getOriginalPosition = function() {
         return this._originalPosition;
-      } 
+      };
 
       ResizableFactory.prototype.setOriginalMousePosition = function(top, left) {
         this._originalMousePosition = { top: top, left: left };
 
         return this;
-      }
+      };
 
       ResizableFactory.prototype.getOriginalMousePosition = function() {
         return this._originalMousePosition;
-      } 
+      };
 
       ResizableFactory.prototype.setOption = function(name, value) {
         this._options[name] = value;
 
         return this;
-      }
+      };
 
       ResizableFactory.prototype.getOption = function(name) {
         return this._options[name];
-      }
+      };
 
       ResizableFactory.prototype.getSize = function() {
         return this._size;
-      }
+      };
 
       ResizableFactory.prototype.getPosition = function() {
         return this._position;
-      }
+      };
 
       ResizableFactory.prototype.getRatio = function() {
         return this._ratio;
-      }
+      };
 
       ResizableFactory.prototype.getAxis = function() {
         return this._axis;
-      }
+      };
 
       ResizableFactory.prototype.getVirtualBoundaries = function() {
         return this._vBoundaries;
-      }
+      };
 
       return ResizableFactory;
     }).
@@ -432,7 +435,7 @@
           position: $scope.resizableFactory.getPosition(),
           size: $scope.resizableFactory.getSize()
         };
-      }
+      };
 
       $scope.resizableHandleMousedown = function(event) {
         // Prevent default dragging of selected content.
@@ -469,7 +472,7 @@
         $rootScope.$broadcast('resizeStop', event, $scope.resizableUiParams());
       };
     }).
-    directive('resizable', function($document) {
+    directive('resizable', function() {
       return {
         restrict: 'A',
         // scope: {
@@ -477,7 +480,7 @@
         //   resizeStop: '&'
         // },
         controller: 'ResizableController',
-        link: function(scope, element, attr) {
+        link: function(scope, element) {
           scope.element = element;
           scope.parentElement = element.parent();
 

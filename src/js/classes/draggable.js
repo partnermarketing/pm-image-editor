@@ -1,4 +1,6 @@
 (function () {
+  'use strict';
+
   angular.module('pmImageEditor').
     factory('DraggableFactory', function() {
       var DraggableFactory = function() {
@@ -16,8 +18,8 @@
         return {
           top: this._position.top+'px',
           left: this._position.left+'px'
-        }
-      }
+        };
+      };
 
       /**
        * Set start data of the draggable element.
@@ -37,7 +39,7 @@
           .setParentSize(parentElement);
 
         return this;
-      }
+      };
 
       /**
        * Update position of draggable element.
@@ -58,18 +60,18 @@
         }
 
         return this;
-      }
+      };
 
       /** Getters/setters */
       DraggableFactory.prototype.setPosition = function(top, left) {
         this._position = { top: top, left: left };
 
         return this;
-      }
+      };
 
       DraggableFactory.prototype.getPosition = function() {
         return this._position;
-      }
+      };
 
       DraggableFactory.prototype.setOriginalMousePosition = function(top, left) {
         this._originalMousePosition = {
@@ -78,11 +80,11 @@
         };
 
         return this;
-      }
+      };
 
       DraggableFactory.prototype.getOriginalMousePosition = function() {
         return this._originalMousePosition;
-      }
+      };
 
       DraggableFactory.prototype.setSize = function(element) {
         this._size = {
@@ -91,11 +93,11 @@
         };
 
         return this;
-      }
+      };
 
       DraggableFactory.prototype.getSize = function() {
         return this._size;
-      }
+      };
 
       DraggableFactory.prototype.setParentSize = function(parentElement) {
         this._parentSize = { 
@@ -104,11 +106,11 @@
         };
 
         return this;
-      }
+      };
 
       DraggableFactory.prototype.getParentSize = function() {
         return this._parentSize;
-      }
+      };
 
       return DraggableFactory;
     }).
@@ -120,7 +122,7 @@
           element: $scope.element,
           position: $scope.draggableFactory.getPosition()
         };
-      }
+      };
 
       $scope.draggableMousedown = function(event) {
         // Prevent default dragging of selected content.
@@ -148,11 +150,11 @@
         $rootScope.$broadcast('dragStop', event, $scope.draggableUiParams());
       };
     }).
-    directive('draggable', function($document) {
+    directive('draggable', function() {
       return {
         restrict: 'A',
         controller: 'DraggableController',
-        link: function(scope, element, attr) {
+        link: function(scope, element) {
           scope.element = element;
           scope.parentElement = element.parent();
 
