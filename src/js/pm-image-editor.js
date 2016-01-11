@@ -22,19 +22,35 @@
 
                 this.selection = null;
                 this.isCropped = false;
+
+                this.hFlip = false;
+                this.vFlip = false;
             }
 
             /**
              * Return css based on curent image data.
              */
             ImageEditorFactory.prototype.css = function() {
+                var transform = [];
+                if (this.rotation) {
+                    transform.push('rotate('+90*this.rotation+'deg)');
+                }
+
+                if (this.vFlip) {
+                    transform.push('scaleX(-1)');
+                }
+
+                if (this.hFlip) {
+                    transform.push('scaleY(-1)');
+                }
+
                 return {
                     position: 'absolute',
                     top: this.top+'px',
                     left: this.left+'px',
                     width: this.width+'px',
                     height: this.height+'px',
-                    transform: this.rotation ? 'rotate('+90*this.rotation+'deg)' : 'none'
+                    transform: transform.length ? transform.join(' ') : 'none'
                 }
             }
 
@@ -101,9 +117,24 @@
                 this.height = this.width/this.ratio;
 
                 this.isCropped = true;
-
-                return this;
             }
+
+            ImageEditorFactory.prototype.horizontalFlip = function() {
+                this.hFlip = !this.hFlip;
+
+                var s = this.parentSize();
+
+                this.top = s.height - this.height - this.top; 
+            }
+
+            ImageEditorFactory.prototype.verticalFlip = function() {
+                this.vFlip = !this.vFlip;
+
+                var s = this.parentSize();
+
+                this.left = s.width - this.width - this.left; 
+            }
+
 
             ImageEditorFactory.prototype.rotate = function(dir) {
                 var ps = this.parentSize();
@@ -195,8 +226,18 @@ console.log(this.rotation%2, r);
                             case 'rotate-acw':
                                 scope.editor.rotate('acw');
                                 break;
+
+                            case 'flip-v':
+                                scope.editor.verticalFlip();
+                                break;
+
+                            case 'flip-h':
+                                scope.editor.horizontalFlip();
+                                break;
                         }
-console.log(scope.editor.css());
+
+                        console.log(scope.editor.css());
+
                         image.css(scope.editor.css());
                         image.parent().css(scope.editor.parentCss());
                     });

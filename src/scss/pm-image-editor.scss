@@ -39,6 +39,7 @@ image-editor {
       height: 32px;
       width: 32px;
       background: transparent url(image-edit-icons.png) 0 0 no-repeat;
+      cursor: pointer;
     }
     .image-editor-rotate-cw {
         background-position: -32px 0;
@@ -46,10 +47,10 @@ image-editor {
     .image-editor-rotate-acw {
         background-position: -64px 0;
     }
-    .image-editor-flip-v {
+    .image-editor-flip-h {
         background-position: -96px 0;
     }
-    .image-editor-flip-h {
+    .image-editor-flip-v {
         background-position: -128px 0;
     }
     .image-editor-undo {

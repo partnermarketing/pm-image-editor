@@ -7,7 +7,7 @@
             scope: {
             },
             link: function (scope, element) {
-                var buttons = 'crop,rotate-cw,rotate-acw';
+                var buttons = 'crop,rotate-cw,rotate-acw,flip-h,flip-v,undo,redo';
                 buttons.split(',').forEach(function(name){
                     var button = angular.element('<span class="image-editor-'+name+'" />');
                     button.on('click', function() {
