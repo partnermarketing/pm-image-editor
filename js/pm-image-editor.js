@@ -5,7 +5,7 @@
  * Copyright (c) 2016 Partnermarketing.com
  * License: MIT
  *
- * Generated at Friday, January 15th, 2016, 9:50:21 AM
+ * Generated at Friday, January 15th, 2016, 10:29:12 AM
  */
 (function() {
 'use strict';
@@ -2652,27 +2652,22 @@
                 // Initially image should fit visible area.
                 this.width = this.visibleWidth;
                 this.height = this.width/this.ratio;
-            }
+            };
 
             /**
              * Return css based on curent image data.
              */
             ImageEditorFactory.prototype.css = function() {
                 var transform = [];
-                if (this.rotation) {
-                    transform.push('rotate('+90*this.rotation+'deg)');
-                }
-
-                // Depends on rotation different axis shouls be reverted.
-                var axis;
                 if (this.vFlip) {
-                    axis = (this.rotation%2) ? 'Y' : 'X';
-                    transform.push('scale'+axis+'(-1)');
+                    transform.push('scaleX(-1)');
                 }
                 if (this.hFlip) {
-                    axis = (this.rotation%2) ? 'X' : 'Y';
-                    transform.push('scale'+axis+'(-1)');
+                    transform.push('scaleY(-1)');
                 }
+                if (this.rotation) {
+                    transform.push('rotate('+90*this.rotation+'deg)');
+                }                
 
                 return {
                     position: 'absolute',
