@@ -7,7 +7,11 @@ node_js:
   - "4.0"
 
 before_install:
+  - npm install -g bower
   - npm install
+  - bower install -f
 
 # Run tests.
-script: gulp lint
+script:
+  - gulp lint
+  - node_modules/karma/bin/karma start

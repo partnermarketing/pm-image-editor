@@ -26,7 +26,8 @@ $RECYCLE.BIN/
 .LSOverride
 
 # Icon must ends with two \r.
-Icon
+Icon
+
 
 # Thumbnails
 ._*
@@ -42,3 +43,7 @@ Icon
 # Installed Bower/Node modules
 bower_components/
 node_modules/
+
+PhantomJS_1.9.8_(Linux_0.0.0)/
+coverage/
+compile/

@@ -3,20 +3,21 @@
     "name": "Partnermarketing.com",
     "email": "developers@partnermarketing.com"
   },
-  "contributors": [{
-    "name": "Bernardo Silva",
-    "email": "benny.stuff@gmail.com"
-  },
-  {
-    "name": "Amy Boyd",
-    "email": "amy@amyboyd.co.uk"
-  },
-  {
-    "name": "Community",
-    "url": "https://github.com/partnermarketing/pm-image-crop/graphs/contributors"
-  }
+  "contributors": [
+    {
+      "name": "Bernardo Silva",
+      "email": "benny.stuff@gmail.com"
+    },
+    {
+      "name": "Amy Boyd",
+      "email": "amy@amyboyd.co.uk"
+    },
+    {
+      "name": "Community",
+      "url": "https://github.com/partnermarketing/pm-image-crop/graphs/contributors"
+    }
   ],
-  "name": "pm-image-crop",
+  "name": "pm-image-editor",
   "version": "0.3.2",
   "description": "Image directive for AngularJS that allow to crop, flip, rotate.",
   "license": "MIT",
@@ -25,7 +26,6 @@
     "type": "git",
     "url": "https://github.com/partnermarketing/pm-image-crop.git"
   },
-  "dependencies": {},
   "devDependencies": {
     "connect-livereload": "^0.4.0",
     "express": "^4.4.5",
@@ -44,9 +44,16 @@
     "gulp-rimraf": "^0.1.0",
     "gulp-uglify": "^0.3.1",
     "gulp-util": "^2.2.19",
+    "jasmine-core": "^2.4.1",
     "jshint-stylish": "^0.2.0",
+    "karma": "^0.12.37",
+    "karma-coverage": "^0.5.3",
+    "karma-jasmine": "^0.3.6",
+    "karma-junit-reporter": "^0.3.8",
+    "karma-phantomjs-launcher": "^0.2.2",
     "minimist": "^0.2.0",
     "opn": "^0.1.2",
+    "phantomjs": "^1.9.19",
     "tiny-lr": "0.0.7"
   },
   "scripts": {
