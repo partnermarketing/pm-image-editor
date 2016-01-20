@@ -1,6 +1,6 @@
 {
-  "name": "pm-image-crop",
-  "version": "0.3.2",
+  "name": "pm-image-editor",
+  "version": "0.4.0",
   "authors": [
     "Partnermarketing.com <developers@partnermarketing.com>",
     "Bernardo Silva <benny.stuff@gmail.com>",
@@ -8,8 +8,8 @@
   ],
   "description": "Image directive for AngularJS that allows to crop, flip, rotate.",
   "main": [
-    "compile/minified/ng-img-crop.js",
-    "compile/minified/ng-img-crop.css"
+    "compile/minified/pm-image-editor.js",
+    "compile/minified/pm-image-editor.css"
   ],
   "keywords": [
     "angular",
@@ -20,7 +20,7 @@
     "rotate"
   ],
   "license": "MIT",
-  "homepage": "https://github.com/partnermarketing/pm-image-crop",
+  "homepage": "https://github.com/partnermarketing/pm-image-editor",
   "ignore": [
     "node_modules",
     "bower_components",

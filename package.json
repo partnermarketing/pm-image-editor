@@ -14,17 +14,17 @@
     },
     {
       "name": "Community",
-      "url": "https://github.com/partnermarketing/pm-image-crop/graphs/contributors"
+      "url": "https://github.com/partnermarketing/pm-image-editor/graphs/contributors"
     }
   ],
   "name": "pm-image-editor",
-  "version": "0.3.2",
+  "version": "0.4.0",
   "description": "Image directive for AngularJS that allow to crop, flip, rotate.",
   "license": "MIT",
-  "homepage": "https://github.com/partnermarketing/pm-image-crop",
+  "homepage": "https://github.com/partnermarketing/pm-image-editor",
   "repository": {
     "type": "git",
-    "url": "https://github.com/partnermarketing/pm-image-crop.git"
+    "url": "https://github.com/partnermarketing/pm-image-editor.git"
   },
   "devDependencies": {
     "connect-livereload": "^0.4.0",

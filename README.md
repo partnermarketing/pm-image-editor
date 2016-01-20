@@ -1,23 +1,23 @@
-# pm-image-crop
+# pm-image-editor
 
-[![License](https://img.shields.io/npm/l/pm-image-crop.svg)](https://www.npmjs.com/package/pm-image-crop)
-[![Build Status](https://travis-ci.org/partnermarketing/pm-image-crop.svg?branch=master)](https://travis-ci.org/partnermarketing/pm-image-crop)
-[![Bower](https://img.shields.io/bower/v/pm-image-crop.svg)](http://bower.io/search/?q=pm-image-crop)
-[![NPM](https://img.shields.io/npm/v/pm-image-crop.svg)](https://www.npmjs.com/package/pm-image-crop)
+[![License](https://img.shields.io/npm/l/pm-image-editor.svg)](https://www.npmjs.com/package/pm-image-editor)
+[![Build Status](https://travis-ci.org/partnermarketing/pm-image-editor.svg?branch=master)](https://travis-ci.org/partnermarketing/pm-image-editor)
+[![Bower](https://img.shields.io/bower/v/pm-image-editor.svg)](http://bower.io/search/?q=pm-image-editor)
+[![NPM](https://img.shields.io/npm/v/pm-image-editor.svg)](https://www.npmjs.com/package/pm-image-editor)
 
-Image Crop directive for AngularJS. Enables to crop a circle or a square out of an image.
+Image Editor directive for AngularJS. Enables to crop a circle or a square out of an image.
 
-Demo is available on http://partnermarketing.github.io/pm-image-crop/index.html
+Demo is available on [http://partnermarketing.github.io/pm-image-editor/index.html](http://partnermarketing.github.io/pm-image-editor/index.html)
 
 ## Screenshots
 
-![Circle Crop](https://raw.github.com/alexk111/ngImgCrop/master/screenshots/circle_1.jpg "Circle Crop")
+![Circle Crop](https://raw.github.com/partnermarketing/pm-image-editor/master/screenshots/circle_1.jpg "Circle Crop")
 
-![Square Crop](https://raw.github.com/alexk111/ngImgCrop/master/screenshots/square_1.jpg "Square Crop")
+![Square Crop](https://raw.github.com/partnermarketing/pm-image-editor/master/screenshots/square_1.jpg "Square Crop")
 
 ## Live demo
 
-[Live demo on JSFiddle](http://jsfiddle.net/alexk111/rw6q9/)
+[Live demo](http://partnermarketing.github.io/pm-image-editor/index.html)
 
 ## Requirements
 
@@ -29,28 +29,28 @@ Demo is available on http://partnermarketing.github.io/pm-image-crop/index.html
 ### Download
 
 
-You can [Download pm-image-crop](https://github.com/partnermarketing/pm-image-crop/archive/master.zip) files from GitHub.
+You can [Download pm-image-editor](https://github.com/partnermarketing/pm-image-editor/archive/master.zip) files from GitHub.
 
 - Use [Bower](http://bower.io) to download the files.
 
 ```sh
-bower install pm-image-crop
+bower install pm-image-editor
 ```
 
-- Use [Npm](https://www.npmjs.com/package/pm-image-crop) to download the files.
+- Use [Npm](https://www.npmjs.com/package/pm-image-editor) to download the files.
 
 ```sh
-npm install pm-image-crop
+npm install pm-image-editor
 ```
 
 ### Add files
 
-Add the scripts to your application. Make sure the `ng-img-crop.js` file is inserted **after** the `angular.js` library:
+Add the scripts to your application. Make sure the `pm-image-editor.js` file is inserted **after** the `angular.js` library:
 
 ```html
 <script src="angular.js"></script>
-<script src="ng-img-crop.js"></script>
-<link rel="stylesheet" type="text/css" href="ng-img-crop.css">
+<script src="pm-image-editor.js"></script>
+<link rel="stylesheet" type="text/css" href="pm-image-editor.css">
 ```
 
 ### Add a dependancy
@@ -58,12 +58,12 @@ Add the scripts to your application. Make sure the `ng-img-crop.js` file is inse
 Add the image crop module as a dependancy to your application module:
 
 ```js
-var myAppModule = angular.module('MyApp', ['ngImgCrop']);
+var myAppModule = angular.module('MyApp', ['pmImageEditor']);
 ```
 
 ## Usage
 
-1. Add the image crop directive `<img-crop>` to the HTML file where you want to use an image crop control. *Note:* a container, you place the directive to, should have some pre-defined size (absolute or relative to its parent). That's required, because the image crop control fits the size of its container.
+1. Add the image editor directive `<image-editor>` to the HTML file where you want to use an image crop control. *Note:* a container, you place the directive to, should have some pre-defined size (absolute or relative to its parent). That's required, because the image crop control fits the size of its container.
 2. Bind the directive to a source image property (using **image=""** option). The directive will read the image data from that property and watch for updates. The property can be a url to an image, or a data uri.
 3. Bind the directive to a result image property (using **result-image=""** option). On each update, the directive will put the content of the crop area to that property in the data uri format.
 4. Set up the options that make sense to your application.
@@ -81,8 +81,8 @@ The following code enables to select an image using a file input and crop it. Th
 <html>
 <head>
   <script src="angular.js"></script>
-  <script src="ng-img-crop.js"></script>
-  <link rel="stylesheet" type="text/css" href="ng-img-crop.css">
+  <script src="pm-image-editor.js"></script>
+  <link rel="stylesheet" type="text/css" href="pm-image-editor.css">
   <style>
     .cropArea {
       background: #E4E4E4;
@@ -92,7 +92,7 @@ The following code enables to select an image using a file input and crop it. Th
     }
   </style>
   <script>
-    angular.module('app', ['ngImgCrop'])
+    angular.module('app', ['pmImageEditor'])
       .controller('Ctrl', function($scope) {
         $scope.myImage='';
         $scope.myCroppedImage='';
@@ -114,7 +114,7 @@ The following code enables to select an image using a file input and crop it. Th
 <body ng-app="app" ng-controller="Ctrl">
   <div>Select an image file: <input type="file" id="fileInput" /></div>
   <div class="cropArea">
-    <img-crop image="myImage" result-image="myCroppedImage"></img-crop>
+    <image-editor image="myImage" result-image="myCroppedImage"></image-editor>
   </div>
   <div>Cropped Image:</div>
   <div><img ng-src="{{myCroppedImage}}" /></div>
@@ -125,7 +125,7 @@ The following code enables to select an image using a file input and crop it. Th
 ## Options
 
 ```html
-<img-crop
+<image-editor
     image="{string}"
     result-image="{string}"
    [change-on-fly="{boolean}"]
@@ -138,16 +138,16 @@ The following code enables to select an image using a file input and crop it. Th
    [on-load-begin="{expression"]
    [on-load-done="{expression"]
    [on-load-error="{expression"]
-></img-crop>
+></image-editor>
 ```
 
 ### image
 
-Assignable angular expression to data-bind to. NgImgCrop gets an image for cropping from it.
+Assignable angular expression to data-bind to. PmImageEditor gets an image for cropping from it.
 
 ### result-image
 
-Assignable angular expression to data-bind to. NgImgCrop puts a data uri of a cropped image into it.
+Assignable angular expression to data-bind to. PmImageEditor puts a data uri of a cropped image into it.
 
 ### change-on-fly
 
