@@ -100,7 +100,7 @@
       };
 
       DraggableFactory.prototype.setParentSize = function(parentElement) {
-        this._parentSize = { 
+        this._parentSize = {
           width: parseInt(parentElement.css('width'), 10) || parentElement[0].clientWidth,
           height: parseInt(parentElement.css('height'), 10) || parentElement[0].clientHeight
         };
@@ -167,4 +167,3 @@
       };
     });
 }());
-

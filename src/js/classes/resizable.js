@@ -66,7 +66,7 @@
 
       /**
        * Calculates boundary object to apply when mouse pointer position changes by dx, dy
-       * through given axis. This object can contain some (at least one) of properties 
+       * through given axis. This object can contain some (at least one) of properties
        * { width: int, height: int, left: int, top: int }.
        *
        * @param int dx
@@ -116,7 +116,7 @@
       /**
        * Updates incoming data to fit ratio.
        *
-       * @param data - boundaries data. 
+       * @param data - boundaries data.
        */
       ResizableFactory.prototype.updateRatio = function(data) {
         if (angular.isNumber(data.height)) {
@@ -141,7 +141,7 @@
       /**
        * Updates current position and size from boundaries data.
        *
-       * @param data - boundaries data. 
+       * @param data - boundaries data.
        */
       ResizableFactory.prototype.updateSizeAndPosition = function(data) {
         if (angular.isNumber(data.left)) {
@@ -198,7 +198,7 @@
       /**
        * Updates boundaries data to fit min/max sizes.
        *
-       * @param data - boundaries data. 
+       * @param data - boundaries data.
        */
       ResizableFactory.prototype.respectSize = function(data) {
         var o = this._vBoundaries,
@@ -249,7 +249,7 @@
       /**
        * Updates boundary data to avoid moving outside parent.
        *
-       * @param data - boundaries data. 
+       * @param data - boundaries data.
        */
       ResizableFactory.prototype.fitContainer = function(data) {
         var continueResize = true;
@@ -273,7 +273,7 @@
             // change top position also  by heights difference.
             this._position.top += h - this._size.height;
           }
-        } 
+        }
 
         if ( this._position.top < 0 ) {
           // If top value is negative, we need to decrease height
@@ -306,7 +306,7 @@
           }
 
           if (this._axis === 'ne' || this._axis === 'n') {
-            this._position.top += h - this._size.height; 
+            this._position.top += h - this._size.height;
           }
         }
 
@@ -356,7 +356,7 @@
       };
 
       ResizableFactory.prototype.setParentSize = function(parentElement) {
-        this._parentData = { 
+        this._parentData = {
           width: parseInt(parentElement.css('width'), 10) || parentElement[0].clientWidth,
           height: parseInt(parentElement.css('height'), 10) || parentElement[0].clientHeight
         };
@@ -451,7 +451,7 @@
       };
 
       $scope.resizableMousemove = function(event) {
-        // Get new boundaries. 
+        // Get new boundaries.
         var boundaryData = $scope.resizableFactory.getBoundaryData(event.screenX, event.screenY);
 
         // And apply css.
