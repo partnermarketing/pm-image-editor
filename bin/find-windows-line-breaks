@@ -1,0 +1,11 @@
+#!/bin/bash
+
+# Exists with code 1 if a `src` file contains Windows line breaks.
+
+for file in $( find src test -type f | grep -E '\.(js|html|scss|yml)$' ); do
+    grep -U $'\015' $file -q
+    if [[ $? == '0' ]]; then
+        echo $file contains Windows line breaks
+        exit 1
+    fi
+done
