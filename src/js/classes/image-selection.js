@@ -10,6 +10,8 @@
                 height: '@'
             },
             link: function (scope, element) {
+                scope.element = element;
+
                 var emitSelectionChanged = function() {
                     scope.$emit(
                         'selectionChanged',
@@ -32,8 +34,15 @@
                         height: scope.height+'px'
                     });
 
-                    emitSelectionChanged();                    
+                    emitSelectionChanged();
                 };
+
+                scope.$on('updateSelection', function(e, editorId, params) {
+                    if (editorId === scope.editorId) {
+                        element.css(params);
+                    }
+                });
+
 
                 scope.$on('dragStop', function(e, event, ui) {
                     if (ui.element.attr('editor-id') === scope.editorId) {
@@ -47,37 +56,7 @@
                     }
                 });
 
-                scope.$on('imageRotate', function(e, editorId) {
-                    if (editorId === scope.editorId) {
-                        element.css({
-                            'top': '0px',
-                            'left': '0px'
-                        });
-
-                        emitSelectionChanged();
-                    }
-                });
-
-                scope.$on('imageCrop', function(e, editorId, params) {
-                    if (editorId === scope.editorId) {
-                        element.css({
-                            'top': '0px',
-                            'left': '0px',
-                            'width': params.width,
-                            'height': params.height
-                        });
-
-                        emitSelectionChanged();
-                    }
-                });
-
-                scope.$on('resetSelection', function(e, editorId) {
-                    if (editorId === scope.editorId) {
-                        resetSelection();
-                    }
-                });
-
-                resetSelection();                
+                resetSelection();
             }
         };
     });
