@@ -72,60 +72,61 @@ image-editor editor-panel .image-editor-redo {
 image-editor editor-panel .disabled {
   opacity: 0.5;
   filter: alpha(opacity=50);
+  cursor: default;
 }
-/* line 68, ../../src/scss/pm-image-editor.scss */
+/* line 69, ../../src/scss/pm-image-editor.scss */
 image-editor .resizable-handle {
   position: absolute;
   width: 6px;
   height: 6px;
   border: 1px solid #f00;
 }
-/* line 74, ../../src/scss/pm-image-editor.scss */
+/* line 75, ../../src/scss/pm-image-editor.scss */
 image-editor .resizable-nw {
   cursor: nw-resize;
   left: 0;
   top: 0;
 }
-/* line 79, ../../src/scss/pm-image-editor.scss */
+/* line 80, ../../src/scss/pm-image-editor.scss */
 image-editor .resizable-ne {
   cursor: ne-resize;
   right: 0;
   top: 0;
 }
-/* line 84, ../../src/scss/pm-image-editor.scss */
+/* line 85, ../../src/scss/pm-image-editor.scss */
 image-editor .resizable-sw {
   bottom: 0;
   cursor: sw-resize;
   left: 0;
 }
-/* line 89, ../../src/scss/pm-image-editor.scss */
+/* line 90, ../../src/scss/pm-image-editor.scss */
 image-editor .resizable-se {
   bottom: 0;
   cursor: se-resize;
   right: 0;
 }
-/* line 94, ../../src/scss/pm-image-editor.scss */
+/* line 95, ../../src/scss/pm-image-editor.scss */
 image-editor .resizable-n {
   cursor: n-resize;
   left: 50%;
   margin-left: -3px;
   top: 0;
 }
-/* line 100, ../../src/scss/pm-image-editor.scss */
+/* line 101, ../../src/scss/pm-image-editor.scss */
 image-editor .resizable-s {
   bottom: 0;
   cursor: s-resize;
   left: 50%;
   margin-left: -3px;
 }
-/* line 106, ../../src/scss/pm-image-editor.scss */
+/* line 107, ../../src/scss/pm-image-editor.scss */
 image-editor .resizable-w {
   cursor: w-resize;
   left: 0;
   margin-top: -3px;
   top: 50%;
 }
-/* line 112, ../../src/scss/pm-image-editor.scss */
+/* line 113, ../../src/scss/pm-image-editor.scss */
 image-editor .resizable-e {
   cursor: e-resize;
   margin-top: -3px;
