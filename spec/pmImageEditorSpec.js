@@ -5,30 +5,154 @@ describe('pmImageEditor', function () {
         module('pmImageEditor');
     });
 
+    describe('ImageHistoryFactory should', function() {
+        var historyFactory,
+            editorFactory;
+
+        beforeEach(inject(function (ImageEditorFactory, ImageHistoryFactory) {
+            editorFactory = new ImageEditorFactory({
+                selectionWidth: 150,
+                selectionHeight: 75,
+                visibleWidth: 300
+            });
+
+            historyFactory = new ImageHistoryFactory(editorFactory);
+        }));
+
+        it('set initial values', function() {
+            expect(historyFactory.editor).toEqual(editorFactory);
+            expect(historyFactory.items).toEqual([]);
+            expect(historyFactory.historyIndex).toBe(-1);
+        });
+
+        it('allow to reset values', function() {
+            historyFactory.items = [1];
+            historyFactory.historyIndex = 1
+
+            historyFactory.reset();
+
+            expect(historyFactory.items).toEqual([]);
+            expect(historyFactory.historyIndex).toBe(-1);
+        });
+
+        it('allow to insert item', function() {
+            historyFactory.addItem();
+
+            expect(historyFactory.items.length).toBe(1);
+            expect(historyFactory.historyIndex).toBe(0);
+        });
+
+        it('remove rest of history during insert item', function() {
+            historyFactory.items = [0, 1, 2, 3];
+            historyFactory.historyIndex = 0;
+
+            historyFactory.addItem();
+
+            expect(historyFactory.items.length).toBe(2);
+            expect(historyFactory.historyIndex).toBe(1);
+        });
+
+        it('allow to detect can undo action be performed', function() {
+            expect(historyFactory.canUndo()).toBe(false);
+
+            // Initial item.
+            historyFactory.addItem();
+            historyFactory.addItem();
+
+            expect(historyFactory.canUndo()).toBe(true);
+        });
+
+        it('allow to detect can redo action be performed', function() {
+            expect(historyFactory.canRedo()).toBe(false);
+
+            // Initial item.
+            historyFactory.addItem();
+            historyFactory.addItem();
+
+            expect(historyFactory.canRedo()).toBe(false);
+
+            historyFactory.undo();
+
+            expect(historyFactory.canRedo()).toBe(true);
+        });
+
+        it('allow to undo action', function() {
+            spyOn(historyFactory, 'applyHistory');
+
+            historyFactory.undo();
+
+            expect(historyFactory.applyHistory).not.toHaveBeenCalled();
+
+            // Initial item.
+            historyFactory.addItem();
+            historyFactory.addItem();
+
+            historyFactory.undo();
+
+            expect(historyFactory.applyHistory).toHaveBeenCalledWith(-1);
+        });
+
+        it('allow to redo action', function() {
+            spyOn(historyFactory, 'applyHistory');
+
+            historyFactory.redo();
+
+            expect(historyFactory.applyHistory).not.toHaveBeenCalled();
+
+            // Initial item.
+            historyFactory.addItem();
+            historyFactory.addItem();
+
+            historyFactory.historyIndex = 0;
+
+            historyFactory.redo();
+
+            expect(historyFactory.applyHistory).toHaveBeenCalledWith(1);
+        });
+
+        it('apply history item', function() {
+            // Initial item.
+            historyFactory.addItem();
+            historyFactory.addItem();
+            historyFactory.addItem();
+
+            historyFactory.historyIndex = 1;
+
+            historyFactory.applyHistory(1);
+
+            expect(historyFactory.historyIndex).toBe(2);
+        });
+    });
+
+
     describe('factory', function() {
         var factory;
 
         beforeEach(inject(function (ImageEditorFactory) {
-            factory = new ImageEditorFactory();
+            factory = new ImageEditorFactory({
+                selectionWidth: 150,
+                selectionHeight: 75,
+                visibleWidth: 300
+            });
         }));
 
         it('should set initial values', function() {
-            expect(factory.visibleWidth).toBe(0);
-            expect(factory.ratio).toBe(1);;
+            expect(factory.visibleWidth).toBe(300);
+            expect(factory.ratio).toBe(1);
 
             expect(factory.naturalWidth).toBe(0);
             expect(factory.naturalHeight).toBe(0);
 
             expect(factory.top).toBe(0);
             expect(factory.left).toBe(0);
-            expect(factory.selection).toBe(null);
+            expect(factory.selection).toEqual({ top: 0, left: 0, width: 150, height: 75, ratio: 2 });
             expect(factory.wasCroppedForRotation).toBe(0);
             expect(factory.isCropped).toBe(false);
             expect(factory.hFlip).toBe(false);
             expect(factory.vFlip).toBe(false);
             expect(factory.rotation).toBe(0);
-            expect(factory.width).toBe(0);
-            expect(factory.height).toBe(0);
+            expect(factory.width).toBe(300);
+            expect(factory.height).toBe(300);
         });
 
         it('should allow to reset transformations', function() {
@@ -47,14 +171,14 @@ describe('pmImageEditor', function () {
 
             expect(factory.top).toBe(0);
             expect(factory.left).toBe(0);
-            expect(factory.selection).toBe(null);
+            expect(factory.selection).toEqual({ top: 0, left: 0, width: 150, height: 75, ratio: 2 });
             expect(factory.wasCroppedForRotation).toBe(0);
             expect(factory.isCropped).toBe(false);
             expect(factory.hFlip).toBe(false);
             expect(factory.vFlip).toBe(false);
             expect(factory.rotation).toBe(0);
-            expect(factory.width).toBe(0);
-            expect(factory.height).toBe(0);             
+            expect(factory.width).toBe(300);
+            expect(factory.height).toBe(300);
         });
 
         describe('should return correct css', function() {
@@ -86,7 +210,7 @@ describe('pmImageEditor', function () {
                     width: '300px',
                     height: '150px',
                     transform: 'rotate(90deg)'
-                }; 
+                };
 
                 expect(factory.css()).toEqual(css);
 
@@ -109,7 +233,7 @@ describe('pmImageEditor', function () {
                     width: '300px',
                     height: '150px',
                     transform: 'scaleX(-1)'
-                }; 
+                };
 
                 expect(factory.css()).toEqual(css);
 
@@ -136,7 +260,7 @@ describe('pmImageEditor', function () {
                     width: '300px',
                     height: '150px',
                     transform: 'scaleY(-1)'
-                }; 
+                };
 
                 expect(factory.css()).toEqual(css);
 
@@ -151,7 +275,7 @@ describe('pmImageEditor', function () {
                 factory.rotation = 3;
                 css.transform = 'scaleY(-1) rotate(270deg)';
                 expect(factory.css()).toEqual(css);
-            });            
+            });
         });
 
         describe('should return correct parent size', function() {
@@ -207,6 +331,23 @@ describe('pmImageEditor', function () {
             expect(factory.parentSize).toHaveBeenCalled();
         });
 
+        it('should return correct selection css', function() {
+            factory.selection = {
+                top: 1,
+                left: 2,
+                width: 3,
+                height: 4
+            };
+
+            expect(factory.selectionCss()).toEqual({
+                top: '1px',
+                left: '2px',
+                width: '3px',
+                height: '4px'
+            });
+        });
+
+
         it('should allow to init data for newly loaded image', function() {
             spyOn(factory, 'resetTransformations').and.callThrough();
 
@@ -254,6 +395,8 @@ describe('pmImageEditor', function () {
         });
 
         it('should allow to crop an image', function() {
+            spyOn(factory.history, 'addItem');
+
             factory.visibleWidth = 200;
             factory.setSelection({ top: 10, left: 20, width: 100, height: 50 });
 
@@ -264,6 +407,8 @@ describe('pmImageEditor', function () {
             factory.ratio = 0.75;
 
             factory.crop();
+
+            expect(factory.history.addItem).toHaveBeenCalled();
 
             expect(factory.top).toBe(-80);
             expect(factory.left).toBe(-120);
@@ -290,10 +435,14 @@ describe('pmImageEditor', function () {
             });
 
             it('(non cropped)', function() {
+                spyOn(factory.history, 'addItem');
+
                 factory.horizontalFlip();
 
                 // Top should be unchanged.
                 expect(factory.top).toBe(0);
+
+                expect(factory.history.addItem).toHaveBeenCalled();
             });
 
             it('(cropped)', function() {
@@ -319,10 +468,14 @@ describe('pmImageEditor', function () {
             });
 
             it('(non cropped)', function() {
+                spyOn(factory.history, 'addItem');
+
                 factory.verticalFlip();
 
                 // Left should be unchanged.
                 expect(factory.left).toBe(0);
+
+                expect(factory.history.addItem).toHaveBeenCalled();
             });
 
             it('(cropped)', function() {
@@ -374,9 +527,13 @@ describe('pmImageEditor', function () {
             });
 
             it('correctly by clock-wise', function() {
+                spyOn(factory.history, 'addItem');
                 expect(factory.parentSize()).toEqual({width: 150, height: 100});
 
+
                 factory.rotate('cw');
+
+                expect(factory.history.addItem).toHaveBeenCalled();
 
                 // Parent sizes should be changed because height became width.
                 expect(factory.parentSize()).toEqual({width: 150, height: 225})
@@ -423,7 +580,7 @@ describe('pmImageEditor', function () {
                 expect(factory.height).toBe(400);
                 expect(factory.top).toBe(-100);
                 expect(factory.left).toBe(-200);
-            });            
+            });
         });
     });
 
@@ -473,52 +630,34 @@ describe('pmImageEditor', function () {
                             css: jasmine.createSpy('parentCss')
                     })
                 };
+                spyOn(scope, 'updateEditorCss');
             });
 
             it('for crop and call editor crop', function() {
                 spyOn(scope.editor, 'crop');
-                spyOn(scope, '$broadcast');
 
                 scope.$emit('editorButtonClick', {name: 'crop'});
 
                 expect(scope.editor.crop).toHaveBeenCalled();
-                expect(scope.$broadcast).toHaveBeenCalledWith(
-                    'imageCrop',
-                    scope.editorId,
-                    scope.editor.parentCss()
-                );
-                expect(scope.imageElement.css).toHaveBeenCalledWith(scope.editor.css());
-                expect(scope.imageElement.parent().css).toHaveBeenCalledWith(scope.editor.parentCss());
+                expect(scope.updateEditorCss).toHaveBeenCalled();
             });
 
             it('for rotate-cw and call editor rotate', function() {
                 spyOn(scope.editor, 'rotate');
-                spyOn(scope, '$broadcast');
 
                 scope.$emit('editorButtonClick', {name: 'rotate-cw'});
 
                 expect(scope.editor.rotate).toHaveBeenCalledWith('cw');
-                expect(scope.$broadcast).toHaveBeenCalledWith(
-                    'imageRotate',
-                    scope.editorId
-                );
-                expect(scope.imageElement.css).toHaveBeenCalledWith(scope.editor.css());
-                expect(scope.imageElement.parent().css).toHaveBeenCalledWith(scope.editor.parentCss());
+                expect(scope.updateEditorCss).toHaveBeenCalled();
             });
 
             it('for rotate-acw and call editor rotate', function() {
                 spyOn(scope.editor, 'rotate');
-                spyOn(scope, '$broadcast');
 
                 scope.$emit('editorButtonClick', {name: 'rotate-acw'});
 
                 expect(scope.editor.rotate).toHaveBeenCalledWith('acw');
-                expect(scope.$broadcast).toHaveBeenCalledWith(
-                    'imageRotate',
-                    scope.editorId
-                );
-                expect(scope.imageElement.css).toHaveBeenCalledWith(scope.editor.css());
-                expect(scope.imageElement.parent().css).toHaveBeenCalledWith(scope.editor.parentCss());
+                expect(scope.updateEditorCss).toHaveBeenCalled();
             });
 
             it('for flip-v and call editor verticalFlip', function() {
@@ -527,8 +666,7 @@ describe('pmImageEditor', function () {
                 scope.$emit('editorButtonClick', {name: 'flip-v'});
 
                 expect(scope.editor.verticalFlip).toHaveBeenCalled();
-                expect(scope.imageElement.css).toHaveBeenCalledWith(scope.editor.css());
-                expect(scope.imageElement.parent().css).toHaveBeenCalledWith(scope.editor.parentCss());
+                expect(scope.updateEditorCss).toHaveBeenCalled();
             });
 
             it('for flip-h and call editor horizontalFlip', function() {
@@ -537,9 +675,26 @@ describe('pmImageEditor', function () {
                 scope.$emit('editorButtonClick', {name: 'flip-h'});
 
                 expect(scope.editor.horizontalFlip).toHaveBeenCalled();
-                expect(scope.imageElement.css).toHaveBeenCalledWith(scope.editor.css());
-                expect(scope.imageElement.parent().css).toHaveBeenCalledWith(scope.editor.parentCss());
-            });            
+                expect(scope.updateEditorCss).toHaveBeenCalled();
+            });
+
+            it('for undo and call editor undo', function() {
+                spyOn(scope.editor.history, 'undo');
+
+                scope.$emit('editorButtonClick', {name: 'undo'});
+
+                expect(scope.editor.history.undo).toHaveBeenCalled();
+                expect(scope.updateEditorCss).toHaveBeenCalled();
+            });
+
+            it('for redo and call editor redo', function() {
+                spyOn(scope.editor.history, 'redo');
+
+                scope.$emit('editorButtonClick', {name: 'redo'});
+
+                expect(scope.editor.history.redo).toHaveBeenCalled();
+                expect(scope.updateEditorCss).toHaveBeenCalled();
+            });
         });
 
         describe('should catch selectionChanged events', function() {
@@ -563,22 +718,60 @@ describe('pmImageEditor', function () {
         it('should allow to update visible width on-fly', function() {
             createCtrl();
 
+            spyOn(scope.editor, 'setVisibleWidth');
+            spyOn(scope, 'updateEditorCss');
+
+            scope.width = 500;
+            scope.$digest();
+
+            expect(scope.editor.setVisibleWidth).toHaveBeenCalledWith(500);
+            expect(scope.updateEditorCss).toHaveBeenCalled();
+        });
+
+        it('should update child css', function() {
+            createCtrl();
+
             scope.imageElement = {
                 css: jasmine.createSpy('css'),
                 parent: jasmine.createSpy('parent').and.returnValue({
                         css: jasmine.createSpy('parentCss')
                 })
             };
-            spyOn(scope.editor, 'setVisibleWidth');
             spyOn(scope, '$broadcast');
+            spyOn(scope, 'updateHistoryButtons');
 
-            scope.width = 500;
-            scope.$digest();
+            scope.updateEditorCss();
 
-            expect(scope.editor.setVisibleWidth).toHaveBeenCalledWith(500);
-            expect(scope.$broadcast).toHaveBeenCalledWith('resetSelection', scope.editorId);
             expect(scope.imageElement.css).toHaveBeenCalledWith(scope.editor.css());
             expect(scope.imageElement.parent().css).toHaveBeenCalledWith(scope.editor.parentCss());
+            expect(scope.$broadcast).toHaveBeenCalledWith('updateSelection', scope.editorId, scope.editor.selectionCss());
+            expect(scope.updateHistoryButtons).toHaveBeenCalled();
+        });
+
+        it('should allow to disableButton undo/redo buttons state', function() {
+            createCtrl();
+
+            spyOn(scope.editor.history, 'canUndo').and.returnValue(false);
+            spyOn(scope.editor.history, 'canRedo').and.returnValue(false);
+            spyOn(scope, '$broadcast');
+
+            scope.updateHistoryButtons();
+
+            expect(scope.$broadcast.calls.argsFor(0)).toEqual(['disableButton', scope.editorId, 'undo']);
+            expect(scope.$broadcast.calls.argsFor(1)).toEqual(['disableButton', scope.editorId, 'redo']);
+        });
+
+        it('should allow to enableButton undo/redo buttons state', function() {
+            createCtrl();
+
+            spyOn(scope.editor.history, 'canUndo').and.returnValue(true);
+            spyOn(scope.editor.history, 'canRedo').and.returnValue(true);
+            spyOn(scope, '$broadcast');
+
+            scope.updateHistoryButtons();
+
+            expect(scope.$broadcast.calls.argsFor(0)).toEqual(['enableButton', scope.editorId, 'undo']);
+            expect(scope.$broadcast.calls.argsFor(1)).toEqual(['enableButton', scope.editorId, 'redo']);
         });
     });
 
@@ -604,7 +797,7 @@ describe('pmImageEditor', function () {
             expect(element.html()).toContain('image-editor-canvas');
             expect(element.html()).toContain('<img');
             expect(element.html()).toContain('<image-selection');
-            expect(element.html()).toContain('<editor-panel>');
+            expect(element.html()).toContain('<editor-panel');
         });
 
 

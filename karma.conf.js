@@ -10,15 +10,16 @@ module.exports = function(config){
       'src/js/classes/draggable.js',
       'src/js/classes/resizable.js',
       'src/js/classes/image-selection.js',
+      'src/js/classes/editor-panel.js',
       'src/js/pm-image-editor.js',
       'spec/**/*.js'
     ],
 
     preprocessors: {
       'src/js/**/*.js': 'coverage'
-    },   
+    },
 
-    singleRun: true, 
+    singleRun: true,
     autoWatch : false,
 
     frameworks: ['jasmine'],

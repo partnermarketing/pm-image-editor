@@ -61,52 +61,13 @@ describe('Image selection', function () {
                 );
             });
 
-            it('on imageRotate', function() {
-                element.css({ top: '10px', left: '20px' });
-                scope.$broadcast('imageRotate', 'editor-1');
+            it('on updateSelection', function() {
+                spyOn(isolatedScope.element, 'css');
 
-                expect(isolatedScope.$emit).toHaveBeenCalledWith(
-                    'selectionChanged',
-                    'editor-1',
-                    {
-                        top: 0,
-                        left: 0,
-                        width: 100,
-                        height: 150
-                    }
-                );
-            });
+                var css = { top: '10px', left: '20px', width: '200px', height: '300px' };
+                scope.$broadcast('updateSelection', 'editor-1', css);
 
-            it('on imageCrop', function() {
-                element.css({ top: '10px', left: '20px' });
-                scope.$broadcast('imageCrop', 'editor-1', { width: '200px', height: '300px' });
-
-                expect(isolatedScope.$emit).toHaveBeenCalledWith(
-                    'selectionChanged',
-                    'editor-1',
-                    {
-                        top: 0,
-                        left: 0,
-                        width: 200,
-                        height: 300
-                    }
-                );
-            });
-
-            it('on resetSelection', function() {
-                element.css({ top: '10px', left: '20px', width: '200px', height: '300px' });
-                scope.$broadcast('resetSelection', 'editor-1');
-
-                expect(isolatedScope.$emit).toHaveBeenCalledWith(
-                    'selectionChanged',
-                    'editor-1',
-                    {
-                        top: 0,
-                        left: 0,
-                        width: 100,
-                        height: 150
-                    }
-                );
+                expect(isolatedScope.element.css).toHaveBeenCalledWith(css);
             });
         });
 
@@ -131,22 +92,12 @@ describe('Image selection', function () {
                 expect(isolatedScope.$emit).not.toHaveBeenCalled();
             });
 
-            it('on imageRotate', function() {
-                scope.$broadcast('imageRotate', 'editor-1');
+            it('on updateSelection', function() {
+                spyOn(isolatedScope.element, 'css');
 
-                expect(isolatedScope.$emit).not.toHaveBeenCalled();
-            });
+                scope.$broadcast('updateSelection', 'editor-1', {});
 
-            it('on imageCrop', function() {
-                scope.$broadcast('imageCrop', 'editor-1', { width: '200px', height: '300px' });
-
-                expect(isolatedScope.$emit).not.toHaveBeenCalled();
-            });
-
-            it('on resetSelection', function() {
-                scope.$broadcast('resetSelection', 'editor-1');
-
-                expect(isolatedScope.$emit).not.toHaveBeenCalled();
+                expect(isolatedScope.element.css).not.toHaveBeenCalled();
             });
         });
 

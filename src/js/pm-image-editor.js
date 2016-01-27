@@ -3,11 +3,75 @@
     'use strict';
 
     angular.module('pmImageEditor')
-        .factory('ImageEditorFactory', function () {
-            var ImageEditorFactory = function() {
+        .factory('ImageHistoryFactory', function () {
+            var ImageHistoryFactory = function(editor) {
+                this.editor = editor;
+                this.reset();
+            };
+
+            ImageHistoryFactory.prototype.reset = function() {
+                this.items = [];
+                this.historyIndex = -1;
+            };
+
+            ImageHistoryFactory.prototype.addItem = function() {
+                this.items = this.items.slice(0, this.historyIndex+1);
+
+                this.items.push({
+                    top: this.editor.top,
+                    left: this.editor.left,
+                    selection: angular.copy(this.editor.selection),
+                    wasCroppedForRotation: this.editor.wasCroppedForRotation,
+                    isCropped: this.editor.isCropped,
+                    hFlip: this.editor.hFlip,
+                    vFlip: this.editor.vFlip,
+                    rotation: this.editor.rotation,
+                    width: this.editor.width,
+                    height: this.editor.height
+                });
+
+                this.historyIndex = this.items.length - 1;
+            };
+
+            ImageHistoryFactory.prototype.canUndo = function() {
+                return this.historyIndex > 0;
+            };
+            ImageHistoryFactory.prototype.canRedo = function() {
+                return this.historyIndex < this.items.length - 1;
+            };
+
+            ImageHistoryFactory.prototype.redo = function() {
+                if (this.canRedo()) {
+                    this.applyHistory(1);
+                }
+            };
+
+            ImageHistoryFactory.prototype.undo = function() {
+                if (this.canUndo()) {
+                    this.applyHistory(-1);
+                }
+            };
+
+            ImageHistoryFactory.prototype.applyHistory = function(offset) {
+                this.historyIndex += offset;
+
+                angular.forEach(
+                    this.items[this.historyIndex],
+                    function(val, key) {
+                        this.editor[key] = angular.isObject(val) ? angular.copy(val) : val;
+                    },
+                    this
+                );
+            };
+
+            return ImageHistoryFactory;
+        })
+        .factory('ImageEditorFactory', function (ImageHistoryFactory) {
+            var ImageEditorFactory = function(options) {
+                this.options = options;
                 // Visible area width. Image should always fit
                 // width or height (depends on rotation) to this area.
-                this.visibleWidth = 0;
+                this.visibleWidth = +(options.visibleWidth || 0);
 
                 // Set default ratio to make resetTransformations works correct.
                 this.ratio = 1;
@@ -15,6 +79,8 @@
                 // Real image width and height.
                 this.naturalWidth = 0;
                 this.naturalHeight = 0;
+
+                this.history = new ImageHistoryFactory(this);
 
                 this.resetTransformations();
             };
@@ -25,7 +91,16 @@
                 this.left = 0;
 
                 // All the editor options.
-                this.selection = null;
+                this.selection = {
+                    top: 0,
+                    left: 0,
+                    width: this.options.selectionWidth || 0,
+                    height: this.options.selectionHeight || 0
+                };
+
+                if (this.selection.width && this.selection.height) {
+                    this.selection.ratio = this.selection.width/this.selection.height;
+                }
 
                 // This variable contains rotation value by mod 2,
                 // for which latest crop was applyed.
@@ -45,6 +120,9 @@
                 // Initially image should fit visible area.
                 this.width = this.visibleWidth;
                 this.height = this.width/this.ratio;
+
+                this.history.reset();
+                this.history.addItem();
             };
 
             /**
@@ -60,7 +138,7 @@
                 }
                 if (this.rotation) {
                     transform.push('rotate('+90*this.rotation+'deg)');
-                }                
+                }
 
                 return {
                     position: 'absolute',
@@ -102,6 +180,18 @@
             };
 
             /**
+             * Return selection css based on curent image data.
+             */
+            ImageEditorFactory.prototype.selectionCss = function() {
+                return {
+                    top: this.selection.top+'px',
+                    left: this.selection.left+'px',
+                    width: this.selection.width+'px',
+                    height: this.selection.height+'px'
+                };
+            };
+
+            /**
              * Set all the required data for image with (naturalWidthxnaturalHeight) dimentions.
              *
              * @param int naturalWidth - image width.
@@ -127,7 +217,7 @@
                 this.visibleWidth = parseInt(visibleWidth, 10);
 
                 // If we updating visibleWidth for existing image we need to reset all the data
-                // to avoid collisions. 
+                // to avoid collisions.
                 if (this.naturalWidth && this.naturalHeight) {
                     this.initImageData(this.naturalWidth, this.naturalHeight);
                 }
@@ -143,6 +233,8 @@
             ImageEditorFactory.prototype.setSelection = function(selection) {
                 this.selection = selection;
                 this.selection.ratio = selection.width/selection.height;
+
+                this.history.addItem();
 
                 return this;
             };
@@ -163,6 +255,14 @@
 
                 this.isCropped = true;
                 this.wasCroppedForRotation = this.rotation % 2;
+
+                var parentSize = this.parentSize();
+                this.selection.top = 0;
+                this.selection.left = 0;
+                this.selection.width = parentSize.width;
+                this.selection.height = parentSize.height;
+
+                this.history.addItem();
             };
 
             /**
@@ -177,7 +277,9 @@
                 // 2. Miror move of Y axe coordinates.
                 // 3. Shift visible area back by Y axe.
                 // 4. Moving center to point (0, -(y0 + h/2)).
-                this.top = s.height - this.height - this.top; 
+                this.top = s.height - this.height - this.top;
+
+                this.history.addItem();
             };
 
             /**
@@ -192,7 +294,9 @@
                 // 2. Miror move of X axe coordinates.
                 // 3. Shift visible area back by X axe.
                 // 4. Moving center to point (-(x0 + w/2), 0).
-                this.left = s.width - this.width - this.left; 
+                this.left = s.width - this.width - this.left;
+
+                this.history.addItem();
             };
 
 
@@ -251,6 +355,11 @@
                     this.left = x0 - a + b;
                     this.top = y0 - a - b + h1;
                 }
+
+                this.selection.top = 0;
+                this.selection.left = 0;
+
+                this.history.addItem();
             };
 
             return ImageEditorFactory;
@@ -258,16 +367,12 @@
         .controller('ImageEditorController', function($scope, ImageEditorFactory) {
             // Create new editor instance and generate uniq id to use in
             // image-selection directive (in case if few editors are present on the same page).
-            $scope.editor = new ImageEditorFactory();
-            $scope.editorId = String(Math.random()).replace('0.', 'editor-');
-
-            // Set initial selection.
-            $scope.editor.setSelection({
-                top: 0,
-                left: 0,
-                width: $scope.selectionWidth,
-                height: $scope.selectionHeight
+            $scope.editor = new ImageEditorFactory({
+                selectionWidth: +$scope.selectionWidth,
+                selectionHeight: +$scope.selectionHeight,
+                visibleWidth: $scope.width
             });
+            $scope.editorId = String(Math.random()).replace('0.', 'editor-');
 
             $scope.editor.setVisibleWidth($scope.width);
 
@@ -278,17 +383,14 @@
                 switch (args.name) {
                     case 'crop':
                         $scope.editor.crop();
-                        $scope.$broadcast('imageCrop', $scope.editorId, $scope.editor.parentCss());
                         break;
 
                     case 'rotate-cw':
                         $scope.editor.rotate('cw');
-                        $scope.$broadcast('imageRotate', $scope.editorId);
                         break;
 
                     case 'rotate-acw':
                         $scope.editor.rotate('acw');
-                        $scope.$broadcast('imageRotate', $scope.editorId);
                         break;
 
                     case 'flip-v':
@@ -298,12 +400,43 @@
                     case 'flip-h':
                         $scope.editor.horizontalFlip();
                         break;
+
+                    case 'undo':
+                        $scope.editor.history.undo();
+                        break;
+
+                    case 'redo':
+                        $scope.editor.history.redo();
+                        break;
                 }
 
-                $scope.imageElement.css($scope.editor.css());
-                $scope.imageElement.parent().css($scope.editor.parentCss());
+                $scope.updateEditorCss();
             });
-            
+
+            $scope.updateEditorCss = function() {
+                if ($scope.imageElement) {
+                    $scope.imageElement.css($scope.editor.css());
+                    $scope.imageElement.parent().css($scope.editor.parentCss());
+                    $scope.$broadcast('updateSelection', $scope.editorId, $scope.editor.selectionCss());
+
+                    $scope.updateHistoryButtons();
+                }
+            };
+
+            $scope.updateHistoryButtons = function() {
+                $scope.$broadcast(
+                    $scope.editor.history.canUndo() ? 'enableButton': 'disableButton',
+                    $scope.editorId,
+                    'undo'
+                );
+
+                $scope.$broadcast(
+                    $scope.editor.history.canRedo() ? 'enableButton': 'disableButton',
+                    $scope.editorId,
+                    'redo'
+                );
+            };
+
             // Image selection can be changed because of dragging/resize.
             // Inform factory if those channes are happens.
             $scope.$on('selectionChanged', function(event, editorId, args) {
@@ -311,6 +444,8 @@
                     event.stopPropagation();
 
                     $scope.editor.setSelection(args);
+
+                    $scope.updateEditorCss();
                 }
             });
 
@@ -318,13 +453,7 @@
                 // If width was changed on-fly, update value.
                 $scope.editor.setVisibleWidth(value);
 
-                // Reset selection to avoid wrong selection position.
-                // For example outside of visible area.
-                $scope.$broadcast('resetSelection', $scope.editorId);
-
-                // And update image and parent css.
-                $scope.imageElement.css($scope.editor.css());
-                $scope.imageElement.parent().css($scope.editor.parentCss());
+                $scope.updateEditorCss();
             });
         })
         .directive('imageEditor', function () {
@@ -348,15 +477,15 @@
                             resizable\
                         ></image-selection>\
                     </div>\
-                    <editor-panel></editor-panel>',
+                    <editor-panel editor-id="{{editorId}}"></editor-panel>',
                 link: function (scope, element) {
                     // Remember image to use in controller.
                     scope.imageElement = element.find('img');
 
                     scope.imageElement[0].onload = function() {
                         scope.editor.initImageData(this.naturalWidth, this.naturalHeight);
-                        scope.imageElement.css(scope.editor.css());
-                        scope.imageElement.parent().css(scope.editor.parentCss());
+
+                        scope.updateEditorCss();
                     };
                 }
             };
