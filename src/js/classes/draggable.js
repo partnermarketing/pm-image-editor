@@ -138,8 +138,12 @@
       $scope.draggableMousemove = function(event) {
         $scope.draggableFactory.updatePosition(event.screenY, event.screenX);
 
-          // Set new element position.
+        // Set new element position.
         $scope.element.css($scope.draggableFactory.css());
+
+        if (angular.isFunction($scope.onDrag)) {
+            $scope.onDrag($scope.draggableFactory.css());
+        }
       };
 
       $scope.draggableMouseup = function(event) {

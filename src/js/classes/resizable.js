@@ -461,7 +461,12 @@
             css[key] = value + 'px';
           }
         });
+
         $scope.element.css(css);
+
+        if (angular.isFunction($scope.onResize)) {
+            $scope.onResize(css);
+        }
       };
 
       $scope.resizableMouseup = function(event) {
@@ -475,10 +480,6 @@
     directive('resizable', function() {
       return {
         restrict: 'A',
-        // scope: {
-        //   resizeStart: '&',
-        //   resizeStop: '&'
-        // },
         controller: 'ResizableController',
         link: function(scope, element) {
           scope.element = element;

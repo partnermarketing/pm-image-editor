@@ -70,7 +70,7 @@ describe('Resizable', function () {
                 target: {className: 'none'}
             }, element);
 
-            expect(factory.getOriginalMousePosition()).toEqual({ top: 20, left: 10 });            
+            expect(factory.getOriginalMousePosition()).toEqual({ top: 20, left: 10 });
             expect(factory.getOriginalPosition()).toEqual({ top: 100, left: 200 });
             expect(factory.getParentSize()).toEqual({ width: 500, height: 600 });
             expect(factory.getOriginalSize()).toEqual({ width: 60, height: 50 });
@@ -106,7 +106,7 @@ describe('Resizable', function () {
 
                 expect(factory.updateBoundaries(10, 20)).toEqual({left: 210, width: 50});
                 expect(factory.updateBoundaries(-10, -20)).toEqual({left: 190, width: 70});
-            }); 
+            });
 
             it('when resize to north', function() {
                 event.target.className = 'resizable-n';
@@ -240,7 +240,7 @@ describe('Resizable', function () {
                 factory.resizeStart(event, element);
 
                 expect(factory.respectSize({width: 300, height: 300})).toEqual({ width: 240, height: 200, left: 20, top: -50 });
-            }); 
+            });
 
             it('if width is less min', function() {
                 event.target.className = 'resizable-sw';
@@ -266,7 +266,7 @@ describe('Resizable', function () {
                 factory.resizeStart(event, element);
 
                 expect(factory.respectSize({left: 3})).toEqual({ left: null });
-            });            
+            });
         });
 
         describe('should update boundary data to fit parent container', function() {
@@ -353,7 +353,7 @@ describe('Resizable', function () {
             createCtrl();
 
             expect(scope.resizableFactory).toBeDefined();
-        });   
+        });
 
         it('should return correct uiParams', function() {
             createCtrl();
@@ -375,7 +375,7 @@ describe('Resizable', function () {
                     height: 50
                 }
             });
-        }); 
+        });
 
         it('should update start values and bind events if mousedown called', function() {
             var event = {
@@ -428,27 +428,34 @@ describe('Resizable', function () {
             expect(rootScope.$broadcast).toHaveBeenCalledWith('resizeStop', event, scope.resizableUiParams());
         });
 
-        it('should update element position if mousemove called', function() {
-            scope.element = angular.element('<div/>');
-            spyOn(scope.element, 'css');
+        describe('should update element position if mousemove called', function() {
+            beforeEach(function() {
+                scope.element = angular.element('<div/>');
+                spyOn(scope.element, 'css');
 
-            createCtrl();
+                createCtrl();
 
-            spyOn(scope.resizableFactory, 'getBoundaryData').and.returnValue({
-                top: 1,
-                left: 2,
-                width: 3,
-                height: 4
+                spyOn(scope.resizableFactory, 'getBoundaryData').and.returnValue({
+                    top: 1,
+                    left: 2,
+                    width: 3,
+                    height: 4
+                });
             });
 
-            scope.resizableMousemove({ screenX: 10, screenY: 20 });
+            it('and update css', function() {
+                scope.resizableMousemove({ screenX: 10, screenY: 20 });
 
-            expect(scope.resizableFactory.getBoundaryData).toHaveBeenCalledWith(10, 20);
-            expect(scope.element.css).toHaveBeenCalledWith({
-                top: '1px',
-                left: '2px',
-                width: '3px',
-                height: '4px'
+                expect(scope.resizableFactory.getBoundaryData).toHaveBeenCalledWith(10, 20);
+                expect(scope.element.css).toHaveBeenCalledWith({ top: '1px', left: '2px', width: '3px', height: '4px' });
+            });
+
+            it('and call scope.onResize if it is present', function() {
+                scope.onResize = jasmine.createSpy('onResize');
+
+                scope.resizableMousemove({ screenX: 10, screenY: 20 });
+
+                expect(scope.onResize).toHaveBeenCalledWith({ top: '1px', left: '2px', width: '3px', height: '4px' });
             });
         });
     });
