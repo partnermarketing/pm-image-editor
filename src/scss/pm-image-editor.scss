@@ -14,15 +14,51 @@ image-editor {
 
   image-selection {
     display: block;
-    box-sizing: border-box;
-    border: 1px solid #f00;
-    width: 100px;
-    height: 50px;
-    overflow: hidden;
+    width: 100%;
+    height: 100%;
     z-index: 10;
 
-    &[draggable] {
+    [draggable] {
       cursor: move;
+    }
+
+    .image-editor-selection-border-top,
+    .image-editor-selection-border-bottom {
+        position: absolute;
+        left: 0;
+        right: 0;
+        height: 1px;
+        background-image: url('data:image/gif;base64,R0lGODlhBgABAKEAAP///wAAADY2Nv///yH/C05FVFNDQVBFMi4wAwEAAAAh/hpDcmVhdGVkIHdpdGggYWpheGxvYWQuaW5mbwAh+QQACgD/ACwAAAAABgABAAACAxQuUgAh+QQBCgADACwAAAAABgABAAACA5SAUgAh+QQBCgADACwAAAAABgABAAACA5SBBQAh+QQBCgADACwAAAAABgABAAACA4QOUAAh+QQBCgADACwAAAAABgABAAACAwSEUAAh+QQBCgADACwAAAAABgABAAACA4SFBQA7');
+        z-index: 1;
+    }
+    .image-editor-selection-border-top {
+        top: 0;
+    }
+    .image-editor-selection-border-bottom {
+        bottom: 0
+    }
+    .image-editor-selection-border-left,
+    .image-editor-selection-border-right {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        width: 1px;
+        background-image: url('data:image/gif;base64,R0lGODlhAQAGAKEAAP///wAAADY2Nv///yH/C05FVFNDQVBFMi4wAwEAAAAh/hpDcmVhdGVkIHdpdGggYWpheGxvYWQuaW5mbwAh+QQACgD/ACwAAAAAAQAGAAACAxQuUgAh+QQBCgADACwAAAAAAQAGAAACA5SAUgAh+QQBCgADACwAAAAAAQAGAAACA5SBBQAh+QQBCgADACwAAAAAAQAGAAACA4QOUAAh+QQBCgADACwAAAAAAQAGAAACAwSEUAAh+QQBCgADACwAAAAAAQAGAAACA4SFBQA7');
+        z-index: 1;
+    }
+    .image-editor-selection-border-left {
+        left: 0;
+    }
+    .image-editor-selection-border-right {
+        right: 0
+    }
+
+    .image-editor-overlay-top,
+    .image-editor-overlay-left,
+    .image-editor-overlay-right,
+    .image-editor-overlay-bottom {
+        position: absolute;
+        background: rgba(0, 0, 0, 0.5);
     }
   }
 
@@ -70,50 +106,51 @@ image-editor {
     position: absolute;
     width: 6px;
     height: 6px;
-    border: 1px solid #f00;
+    border: 1px solid #000;
+    box-shadow: 1px 1px 0 rgba(255, 255, 255, 0.6), inset 1px 1px 0 rgba(255, 255, 255, 0.6);
   }
   .resizable-nw {
     cursor: nw-resize;
-    left: 0;
-    top: 0;
+    left: 1px;
+    top: 1px;
   }
   .resizable-ne {
     cursor: ne-resize;
-    right: 0;
-    top: 0;
+    right: 1px;
+    top: 1px;
   }
   .resizable-sw {
-    bottom: 0;
+    bottom: 1px;
     cursor: sw-resize;
-    left: 0;
+    left: 1px;
   }
   .resizable-se {
-    bottom: 0;
+    bottom: 1px;
     cursor: se-resize;
-    right: 0;
+    right: 1px;
   }
   .resizable-n {
     cursor: n-resize;
     left: 50%;
     margin-left: -3px;
-    top: 0;
+    top: 1px;
   }
   .resizable-s {
-    bottom: 0;
+    bottom: 1px;
     cursor: s-resize;
     left: 50%;
     margin-left: -3px;
   }
   .resizable-w {
     cursor: w-resize;
-    left: 0;
+    left: 1px;
     margin-top: -3px;
     top: 50%;
   }
   .resizable-e {
     cursor: e-resize;
     margin-top: -3px;
-    right: 0;
+    right: 1px;
     top: 50%;
   }
 }
