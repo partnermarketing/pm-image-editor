@@ -15,26 +15,66 @@ image-editor .image-editor-canvas {
 /* line 15, ../../src/scss/pm-image-editor.scss */
 image-editor image-selection {
   display: block;
-  -webkit-box-sizing: border-box;
-          box-sizing: border-box;
-  border: 1px solid #f00;
-  width: 100px;
-  height: 50px;
-  overflow: hidden;
+  width: 100%;
+  height: 100%;
   z-index: 10;
 }
-/* line 24, ../../src/scss/pm-image-editor.scss */
-image-editor image-selection[draggable] {
+/* line 21, ../../src/scss/pm-image-editor.scss */
+image-editor image-selection [draggable] {
   cursor: move;
 }
-/* line 29, ../../src/scss/pm-image-editor.scss */
+/* line 25, ../../src/scss/pm-image-editor.scss */
+image-editor image-selection .image-editor-selection-border-top,
+image-editor image-selection .image-editor-selection-border-bottom {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background-image: url("data:image/gif;base64,R0lGODlhBgABAKEAAP///wAAADY2Nv///yH/C05FVFNDQVBFMi4wAwEAAAAh/hpDcmVhdGVkIHdpdGggYWpheGxvYWQuaW5mbwAh+QQACgD/ACwAAAAABgABAAACAxQuUgAh+QQBCgADACwAAAAABgABAAACA5SAUgAh+QQBCgADACwAAAAABgABAAACA5SBBQAh+QQBCgADACwAAAAABgABAAACA4QOUAAh+QQBCgADACwAAAAABgABAAACAwSEUAAh+QQBCgADACwAAAAABgABAAACA4SFBQA7");
+  z-index: 1;
+}
+/* line 34, ../../src/scss/pm-image-editor.scss */
+image-editor image-selection .image-editor-selection-border-top {
+  top: 0;
+}
+/* line 37, ../../src/scss/pm-image-editor.scss */
+image-editor image-selection .image-editor-selection-border-bottom {
+  bottom: 0;
+}
+/* line 40, ../../src/scss/pm-image-editor.scss */
+image-editor image-selection .image-editor-selection-border-left,
+image-editor image-selection .image-editor-selection-border-right {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background-image: url("data:image/gif;base64,R0lGODlhAQAGAKEAAP///wAAADY2Nv///yH/C05FVFNDQVBFMi4wAwEAAAAh/hpDcmVhdGVkIHdpdGggYWpheGxvYWQuaW5mbwAh+QQACgD/ACwAAAAAAQAGAAACAxQuUgAh+QQBCgADACwAAAAAAQAGAAACA5SAUgAh+QQBCgADACwAAAAAAQAGAAACA5SBBQAh+QQBCgADACwAAAAAAQAGAAACA4QOUAAh+QQBCgADACwAAAAAAQAGAAACAwSEUAAh+QQBCgADACwAAAAAAQAGAAACA4SFBQA7");
+  z-index: 1;
+}
+/* line 49, ../../src/scss/pm-image-editor.scss */
+image-editor image-selection .image-editor-selection-border-left {
+  left: 0;
+}
+/* line 52, ../../src/scss/pm-image-editor.scss */
+image-editor image-selection .image-editor-selection-border-right {
+  right: 0;
+}
+/* line 56, ../../src/scss/pm-image-editor.scss */
+image-editor image-selection .image-editor-overlay-top,
+image-editor image-selection .image-editor-overlay-left,
+image-editor image-selection .image-editor-overlay-right,
+image-editor image-selection .image-editor-overlay-bottom {
+  position: absolute;
+  background: rgba(0, 0, 0, 0.5);
+}
+/* line 65, ../../src/scss/pm-image-editor.scss */
 image-editor editor-panel {
   display: block;
   position: absolute;
   bottom: 0;
   left: 0;
 }
-/* line 35, ../../src/scss/pm-image-editor.scss */
+/* line 71, ../../src/scss/pm-image-editor.scss */
 image-editor editor-panel span {
   float: left;
   display: block;
@@ -44,92 +84,94 @@ image-editor editor-panel span {
   background: transparent url(image-edit-icons.png) 0 0 no-repeat;
   cursor: pointer;
 }
-/* line 44, ../../src/scss/pm-image-editor.scss */
+/* line 80, ../../src/scss/pm-image-editor.scss */
 image-editor editor-panel .image-editor-rotate-cw {
   background-position: -32px 0;
 }
-/* line 47, ../../src/scss/pm-image-editor.scss */
+/* line 83, ../../src/scss/pm-image-editor.scss */
 image-editor editor-panel .image-editor-rotate-acw {
   background-position: -64px 0;
 }
-/* line 50, ../../src/scss/pm-image-editor.scss */
+/* line 86, ../../src/scss/pm-image-editor.scss */
 image-editor editor-panel .image-editor-flip-h {
   background-position: -96px 0;
 }
-/* line 53, ../../src/scss/pm-image-editor.scss */
+/* line 89, ../../src/scss/pm-image-editor.scss */
 image-editor editor-panel .image-editor-flip-v {
   background-position: -128px 0;
 }
-/* line 56, ../../src/scss/pm-image-editor.scss */
+/* line 92, ../../src/scss/pm-image-editor.scss */
 image-editor editor-panel .image-editor-undo {
   background-position: -160px 0;
 }
-/* line 59, ../../src/scss/pm-image-editor.scss */
+/* line 95, ../../src/scss/pm-image-editor.scss */
 image-editor editor-panel .image-editor-redo {
   background-position: -192px 0;
 }
-/* line 62, ../../src/scss/pm-image-editor.scss */
+/* line 98, ../../src/scss/pm-image-editor.scss */
 image-editor editor-panel .disabled {
   opacity: 0.5;
   filter: alpha(opacity=50);
   cursor: default;
 }
-/* line 69, ../../src/scss/pm-image-editor.scss */
+/* line 105, ../../src/scss/pm-image-editor.scss */
 image-editor .resizable-handle {
   position: absolute;
   width: 6px;
   height: 6px;
-  border: 1px solid #f00;
+  border: 1px solid #000;
+  -webkit-box-shadow: 1px 1px 0 rgba(255, 255, 255, 0.6), inset 1px 1px 0 rgba(255, 255, 255, 0.6);
+          box-shadow: 1px 1px 0 rgba(255, 255, 255, 0.6), inset 1px 1px 0 rgba(255, 255, 255, 0.6);
 }
-/* line 75, ../../src/scss/pm-image-editor.scss */
+/* line 112, ../../src/scss/pm-image-editor.scss */
 image-editor .resizable-nw {
   cursor: nw-resize;
-  left: 0;
-  top: 0;
+  left: 1px;
+  top: 1px;
 }
-/* line 80, ../../src/scss/pm-image-editor.scss */
+/* line 117, ../../src/scss/pm-image-editor.scss */
 image-editor .resizable-ne {
   cursor: ne-resize;
-  right: 0;
-  top: 0;
+  right: 1px;
+  top: 1px;
 }
-/* line 85, ../../src/scss/pm-image-editor.scss */
+/* line 122, ../../src/scss/pm-image-editor.scss */
 image-editor .resizable-sw {
-  bottom: 0;
+  bottom: 1px;
   cursor: sw-resize;
-  left: 0;
+  left: 1px;
 }
-/* line 90, ../../src/scss/pm-image-editor.scss */
+/* line 127, ../../src/scss/pm-image-editor.scss */
 image-editor .resizable-se {
-  bottom: 0;
+  bottom: 1px;
   cursor: se-resize;
-  right: 0;
+  right: 1px;
 }
-/* line 95, ../../src/scss/pm-image-editor.scss */
+/* line 132, ../../src/scss/pm-image-editor.scss */
 image-editor .resizable-n {
   cursor: n-resize;
   left: 50%;
   margin-left: -3px;
-  top: 0;
+  top: 1px;
 }
-/* line 101, ../../src/scss/pm-image-editor.scss */
+/* line 138, ../../src/scss/pm-image-editor.scss */
 image-editor .resizable-s {
-  bottom: 0;
+  bottom: 1px;
   cursor: s-resize;
   left: 50%;
   margin-left: -3px;
 }
-/* line 107, ../../src/scss/pm-image-editor.scss */
+/* line 144, ../../src/scss/pm-image-editor.scss */
 image-editor .resizable-w {
   cursor: w-resize;
-  left: 0;
+  left: 1px;
   margin-top: -3px;
   top: 50%;
 }
-/* line 113, ../../src/scss/pm-image-editor.scss */
+/* line 150, ../../src/scss/pm-image-editor.scss */
 image-editor .resizable-e {
   cursor: e-resize;
   margin-top: -3px;
-  right: 0;
+  right: 1px;
   top: 50%;
 }
