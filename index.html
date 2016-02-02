@@ -1,10 +1,8 @@
 <!DOCTYPE html>
-<html ng-app="app">
+<html>
 <head>
   <title>pmImageEditor Test Page</title>
-  <script src="js/angular.min.js"></script>
-  <script type="text/javascript" src="js/pm-image-editor.js"></script>
-  <link rel="stylesheet" href="css/pm-image-editor.css"/>
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.29/angular.min.js"></script>
   <style>
     .row {
       margin-bottom: 20px;
@@ -49,24 +47,54 @@
   </div>
 
   <script type="text/javascript">
-    angular.module('app', ['pmImageEditor'])
-      .controller('Ctrl', function($scope) {
-        var widths = {
-          'small': 300,
-          'medium': 500,
-          'big': 800
-        };
+    function initApp() {
+      angular.module('app', ['pmImageEditor'])
+        .controller('Ctrl', function($scope) {
+          var widths = {
+            'small': 300,
+            'medium': 500,
+            'big': 800
+          };
 
-        $scope.size = 'small';
-        $scope.width = widths[$scope.size];
-        $scope.image = 'test.jpg';
+          $scope.size = 'small';
+          $scope.width = widths[$scope.size];
+          $scope.image = 'test.jpg';
 
-        $scope.$watch('size', function(value) {
-          if (value) {
-            $scope.width = widths[value]
-          }
+          $scope.$watch('size', function(value) {
+            if (value) {
+              $scope.width = widths[value]
+            }
+          });
         });
-      });
-  </script>
+
+      angular.bootstrap(document, ['app']);
+    }
+
+    function getParameterByName(name) {
+      name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
+      var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
+          results = regex.exec(location.search);
+
+      return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
+    };
+
+    var branch = getParameterByName('branch') || 'master';
+    branch += '/'; 
+
+    var script = document.createElement('script');
+    script.type = 'text/javascript';
+    script.async = true;
+    script.src = 'https://rawgit.com/partnermarketing/pm-image-editor/'+branch+'compile/unminified/pm-image-editor.js';
+    script.onload = initApp;
+
+    var s = document.getElementsByTagName('script')[0];
+    s.parentNode.insertBefore(script, s);
+
+    var link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.href = 'https://rawgit.com/partnermarketing/pm-image-editor/'+branch+'compile/unminified/pm-image-editor.css';
+
+    s.parentNode.insertBefore(link, s);
+  </script>  
 </body>
 </html>
