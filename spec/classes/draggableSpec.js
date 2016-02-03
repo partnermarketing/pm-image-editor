@@ -88,7 +88,7 @@ describe('Draggable', function () {
             factory.setSize({0: {clientWidth: 100, clientHeight: 200}, css: function() {}});
 
             expect(factory.getSize()).toEqual({width: 100, height: 200});
-        });  
+        });
 
         it('should extract parent size from real size if css missed', function() {
             factory.setParentSize({0: {clientWidth: 100, clientHeight: 200}, css: function() {}});
@@ -123,7 +123,7 @@ describe('Draggable', function () {
             createCtrl();
 
             expect(scope.draggableFactory).toBeDefined();
-        });   
+        });
 
         it('should return correct draggableUiParams', function() {
             createCtrl();
@@ -136,7 +136,7 @@ describe('Draggable', function () {
                 element: {},
                 position: { top: 10, left: 20 }
             });
-        }); 
+        });
 
         it('should update start values and bind events if mousedown called', function() {
             var event = {
@@ -186,23 +186,37 @@ describe('Draggable', function () {
             expect(rootScope.$broadcast).toHaveBeenCalledWith('dragStop', event, scope.draggableUiParams());
         });
 
-        it('should update element position if mousemove called', function() {
-            var event = {
-                screenX: 10,
-                screenY: 20
-            };
+        describe('should update element position if mousemove called', function() {
+            var event;
 
-            createCtrl();
+            beforeEach(function() {
+                event = {
+                    screenX: 10,
+                    screenY: 20
+                };
 
-            scope.element = {css: jasmine.createSpy('css')};
+                createCtrl();
 
-            spyOn(scope.draggableFactory, 'updatePosition');
-            spyOn(scope.draggableFactory, 'css').and.returnValue({top: '1px', left: '2px'});
+                scope.element = {css: jasmine.createSpy('css')};
 
-            scope.draggableMousemove(event);
+                spyOn(scope.draggableFactory, 'updatePosition');
+                spyOn(scope.draggableFactory, 'css').and.returnValue({top: '1px', left: '2px'});
+            });
 
-            expect(scope.draggableFactory.updatePosition).toHaveBeenCalledWith(20, 10);
-            expect(scope.element.css).toHaveBeenCalledWith({top: '1px', left: '2px'});
+            it('and update css', function() {
+                scope.draggableMousemove(event);
+
+                expect(scope.draggableFactory.updatePosition).toHaveBeenCalledWith(20, 10);
+                expect(scope.element.css).toHaveBeenCalledWith({top: '1px', left: '2px'});
+            });
+
+            it('and call scope.onDrag if it is present', function() {
+                scope.onDrag = jasmine.createSpy('onDrag');
+
+                scope.draggableMousemove(event);
+
+                expect(scope.onDrag).toHaveBeenCalledWith({top: '1px', left: '2px'});
+            });
         });
     });
 

@@ -5,7 +5,7 @@
  * Copyright (c) 2016 Partnermarketing.com
  * License: MIT
  *
- * Generated at Tuesday, February 2nd, 2016, 8:43:55 AM
+ * Generated at Tuesday, February 2nd, 2016, 8:51:04 AM
  */
 (function() {
 'use strict';
@@ -1970,8 +1970,12 @@
       $scope.draggableMousemove = function(event) {
         $scope.draggableFactory.updatePosition(event.screenY, event.screenX);
 
-          // Set new element position.
+        // Set new element position.
         $scope.element.css($scope.draggableFactory.css());
+
+        if (angular.isFunction($scope.onDrag)) {
+            $scope.onDrag($scope.draggableFactory.css());
+        }
       };
 
       $scope.draggableMouseup = function(event) {
@@ -2053,24 +2057,89 @@
                 width: '@',
                 height: '@'
             },
+            template: '\
+                <div class="image-editor-selection" editor-id="{{editorId}}" draggable resizable>\
+                    <div class="image-editor-selection-border-top"></div>\
+                    <div class="image-editor-selection-border-bottom"></div>\
+                    <div class="image-editor-selection-border-left"></div>\
+                    <div class="image-editor-selection-border-right"></div>\
+                </div>\
+                <div class="image-editor-overlay-top"></div>\
+                <div class="image-editor-overlay-left"></div>\
+                <div class="image-editor-overlay-bottom"></div>\
+                <div class="image-editor-overlay-right"></div>',
             link: function (scope, element) {
-                scope.element = element;
+                scope.selection = angular.element(element[0].querySelector('.image-editor-selection'));
+                scope.overlay = {
+                    'top': angular.element(element[0].querySelector('.image-editor-overlay-top')),
+                    'left': angular.element(element[0].querySelector('.image-editor-overlay-left')),
+                    'bottom': angular.element(element[0].querySelector('.image-editor-overlay-bottom')),
+                    'right': angular.element(element[0].querySelector('.image-editor-overlay-right'))
+                };
+
+                scope.onDrag = function(css) {
+                    scope.setSelectionCss(css);
+                };
+
+                scope.onResize = function(css) {
+                    scope.setSelectionCss(css);
+                };
+
+                scope.setSelectionCss = function(params) {
+                    scope.selection.css(params);
+
+                    var data = scope.getSelectionData();
+                    // Top overlay should sit above selection and have all visible area width.
+                    scope.overlay.top.css({
+                        top: '0px',
+                        left: '0px',
+                        right: '0px',
+                        height: data.top + 'px'
+                    });
+                    // Bottom overlay should be below selection and have all visible area width.
+                    scope.overlay.bottom.css({
+                        top: (data.top + data.height) + 'px',
+                        left: '0px',
+                        right: '0px',
+                        bottom: '0px'
+                    });
+                    // Left overlay placed at the left of selection.
+                    // Should have same height as selection to avoid overlap.
+                    scope.overlay.left.css({
+                        top: data.top + 'px',
+                        left: '0px',
+                        width: data.left + 'px',
+                        height: data.height + 'px'
+                    });
+                    // Right overlay placed at the right of selection.
+                    // Should have same height as selection to avoid overlap.
+                    scope.overlay.right.css({
+                        top: data.top + 'px',
+                        left: (data.left + data.width)+'px',
+                        right: '0px',
+                        height: data.height + 'px'
+                    });
+                };
+
+                scope.getSelectionData = function() {
+                    return {
+                        top: parseInt(scope.selection.css('top'), 10),
+                        left: parseInt(scope.selection.css('left'), 10),
+                        width: parseInt(scope.selection.css('width'), 10),
+                        height: parseInt(scope.selection.css('height'), 10)
+                    };
+                };
 
                 var emitSelectionChanged = function() {
                     scope.$emit(
                         'selectionChanged',
                         scope.editorId,
-                        {
-                            top: parseInt(element.css('top'), 10),
-                            left: parseInt(element.css('left'), 10),
-                            width: parseInt(element.css('width'), 10),
-                            height: parseInt(element.css('height'), 10)
-                        }
+                        scope.getSelectionData()
                     );
                 };
 
                 var resetSelection = function() {
-                    element.css({
+                    scope.setSelectionCss({
                         position: 'absolute',
                         top: '0px',
                         left: '0px',
@@ -2083,7 +2152,7 @@
 
                 scope.$on('updateSelection', function(e, editorId, params) {
                     if (editorId === scope.editorId) {
-                        element.css(params);
+                        scope.setSelectionCss(params);
                     }
                 });
 
@@ -2565,7 +2634,12 @@
             css[key] = value + 'px';
           }
         });
+
         $scope.element.css(css);
+
+        if (angular.isFunction($scope.onResize)) {
+            $scope.onDrag(css);
+        }
       };
 
       $scope.resizableMouseup = function(event) {
@@ -2579,10 +2653,6 @@
     directive('resizable', function() {
       return {
         restrict: 'A',
-        // scope: {
-        //   resizeStart: '&',
-        //   resizeStop: '&'
-        // },
         controller: 'ResizableController',
         link: function(scope, element) {
           scope.element = element;
@@ -3079,8 +3149,6 @@
                             width="{{selectionWidth}}"\
                             height="{{selectionHeight}}"\
                             editor-id="{{editorId}}"\
-                            draggable\
-                            resizable\
                         ></image-selection>\
                     </div>\
                     <editor-panel editor-id="{{editorId}}"></editor-panel>',

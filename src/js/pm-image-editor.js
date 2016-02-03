@@ -473,8 +473,6 @@
                             width="{{selectionWidth}}"\
                             height="{{selectionHeight}}"\
                             editor-id="{{editorId}}"\
-                            draggable\
-                            resizable\
                         ></image-selection>\
                     </div>\
                     <editor-panel editor-id="{{editorId}}"></editor-panel>',
