@@ -5,7 +5,7 @@
  * Copyright (c) 2016 Partnermarketing.com
  * License: MIT
  *
- * Generated at Tuesday, February 2nd, 2016, 8:51:04 AM
+ * Generated at Wednesday, February 3rd, 2016, 4:30:46 PM
  */
 (function() {
 'use strict';
@@ -2048,6 +2048,7 @@
 }());
 
 
+/*jshint multistr: true */
 (function () {
         angular.module('pmImageEditor').directive('imageSelection', function () {
         return {
@@ -2638,7 +2639,7 @@
         $scope.element.css(css);
 
         if (angular.isFunction($scope.onResize)) {
-            $scope.onDrag(css);
+            $scope.onResize(css);
         }
       };
 
@@ -2903,6 +2904,30 @@
             };
 
             /**
+             * Update selection dimensions to new width and height.
+             * If width and height are correct -- reset all transformations to avoid positions issues.
+             *
+             * @param int width
+             * @param int height
+             */
+            ImageEditorFactory.prototype.updateSelectionDimensions = function(width, height) {
+                var parentSize = this.parentSize();
+                if (width <= parentSize.width && height <= parentSize.height) {
+                    this.options.selectionWidth = width;
+                    this.options.selectionHeight = height;
+
+                    this.selection.top = 0;
+                    this.selection.left = 0;
+                    this.selection.width = width;
+                    this.selection.height = height;
+                } else {
+                    throw new RangeError('Incorrect selection size');
+                }
+
+                return this;
+            };
+
+            /**
              * Set selection data.
              *
              * @param Object{width: int, height: int} selection - selection parameters.
@@ -3131,6 +3156,16 @@
 
                 $scope.updateEditorCss();
             });
+
+            var handleSelectionDimensions = function(value) {
+                if (+value) {
+                    $scope.editor.updateSelectionDimensions(+$scope.selectionWidth, +$scope.selectionHeight);
+                    $scope.updateEditorCss();
+                }
+            };
+
+            $scope.$watch('selectionWidth', handleSelectionDimensions);
+            $scope.$watch('selectionHeight', handleSelectionDimensions);
         })
         .directive('imageEditor', function () {
             return {
