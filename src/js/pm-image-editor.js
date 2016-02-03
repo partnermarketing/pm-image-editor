@@ -226,6 +226,30 @@
             };
 
             /**
+             * Update selection dimensions to new width and height.
+             * If width and height are correct -- reset all transformations to avoid positions issues.
+             *
+             * @param int width
+             * @param int height
+             */
+            ImageEditorFactory.prototype.updateSelectionDimensions = function(width, height) {
+                var parentSize = this.parentSize();
+                if (width <= parentSize.width && height <= parentSize.height) {
+                    this.options.selectionWidth = width;
+                    this.options.selectionHeight = height;
+
+                    this.selection.top = 0;
+                    this.selection.left = 0;
+                    this.selection.width = width;
+                    this.selection.height = height;
+                } else {
+                    throw new RangeError('Incorrect selection size');
+                }
+
+                return this;
+            };
+
+            /**
              * Set selection data.
              *
              * @param Object{width: int, height: int} selection - selection parameters.
@@ -455,6 +479,16 @@
 
                 $scope.updateEditorCss();
             });
+
+            var handleSelectionDimensions = function(value) {
+                if (+value) {
+                    $scope.editor.updateSelectionDimensions(+$scope.selectionWidth, +$scope.selectionHeight);
+                    $scope.updateEditorCss();
+                }
+            };
+
+            $scope.$watch('selectionWidth', handleSelectionDimensions);
+            $scope.$watch('selectionHeight', handleSelectionDimensions);
         })
         .directive('imageEditor', function () {
             return {

@@ -384,6 +384,28 @@ describe('pmImageEditor', function () {
             expect(factory.initImageData).toHaveBeenCalledWith(200, 100);
         });
 
+        it('should allow to update selection if input is correct', function() {
+            expect(factory.selection.width).toBe(150);
+            expect(factory.selection.height).toBe(75);
+
+            // Initial parent area size is 300x300, so 110x120 is good.
+            factory.updateSelectionDimensions(110, 120);
+
+            expect(factory.selection.top).toBe(0);
+            expect(factory.selection.left).toBe(0);
+            expect(factory.selection.width).toBe(110);
+            expect(factory.selection.height).toBe(120);
+        });
+
+        it('should throw exception if input is incorrect', function() {
+            var test = function() {
+                // Initial parent area size is 300x300, so 310x120 is too big.
+                factory.updateSelectionDimensions(310, 120);
+            }
+
+            expect(test).toThrowError('Incorrect selection size');
+        });
+
         it('should allow to set selection', function() {
             factory.setSelection({ width: 200, height: 100 });
 
