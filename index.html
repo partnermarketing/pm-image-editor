@@ -4,6 +4,9 @@
   <title>pmImageEditor Test Page</title>
   <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.29/angular.min.js"></script>
   <style>
+    body {
+      font-family: Arial;
+    }
     .row {
       margin-bottom: 20px;
     }
@@ -37,12 +40,18 @@
     <label><input type="radio" ng-model="image" value="test_100x400.png" /> 100x400 </label>
   </div>
 
+  <div class="row">
+    Selection (width &times; height):
+    <input type="text" ng-model="selectionWidth" /> &times; <input type="text" ng-model="selectionHeight" />
+  </div>
+
+
 
   <div class="editorArea" ng-class="{'big':size=='big', 'medium':size=='medium', 'small':size=='small'}">
     <image-editor image="{{ image }}"
                   width="{{ width }}"
-                  selection-width="100"
-                  selection-height="70"
+                  selection-width="{{ selectionWidth }}"
+                  selection-height="{{ selectionHeight }}"
     ></image-editor>
   </div>
 
@@ -55,7 +64,8 @@
             'medium': 500,
             'big': 800
           };
-
+          $scope.selectionWidth = 100;
+          $scope.selectionHeight = 70;
           $scope.size = 'small';
           $scope.width = widths[$scope.size];
           $scope.image = 'test.jpg';
