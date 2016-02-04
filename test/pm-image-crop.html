@@ -6,6 +6,9 @@
   <script type="text/javascript" src="../compile/unminified/pm-image-editor.js"></script>
   <link rel="stylesheet" href="../compile/unminified/pm-image-editor.css"/>
   <style>
+    body {
+      font-family: Arial;
+    }
     .row {
       margin-bottom: 20px;
     }
@@ -39,12 +42,16 @@
     <label><input type="radio" ng-model="image" value="test_100x400.png" /> 100x400 </label>
   </div>
 
+  <div class="row">
+    Selection (width &times; height):
+    <input type="text" ng-model="selectionWidth" /> &times; <input type="text" ng-model="selectionHeight" />
+  </div>
 
   <div class="editorArea" ng-class="{'big':size=='big', 'medium':size=='medium', 'small':size=='small'}">
     <image-editor image="{{ image }}"
                   width="{{ width }}"
-                  selection-width="100"
-                  selection-height="70"
+                  selection-width="{{ selectionWidth }}"
+                  selection-height="{{ selectionHeight }}"
     ></image-editor>
   </div>
 
@@ -60,6 +67,9 @@
         $scope.size = 'small';
         $scope.width = widths[$scope.size];
         $scope.image = 'test.jpg';
+        $scope.selectionWidth = 100;
+        $scope.selectionHeight = 70;
+
 
         $scope.$watch('size', function(value) {
           if (value) {
