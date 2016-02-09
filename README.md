@@ -5,15 +5,13 @@
 [![Bower](https://img.shields.io/bower/v/pm-image-editor.svg)](http://bower.io/search/?q=pm-image-editor)
 [![NPM](https://img.shields.io/npm/v/pm-image-editor.svg)](https://www.npmjs.com/package/pm-image-editor)
 
-Image Editor directive for AngularJS. Enables to crop a circle or a square out of an image.
+Image Editor directive for AngularJS. Enables to crop a rectangle out of an image.
 
 Demo is available on [http://partnermarketing.github.io/pm-image-editor/index.html](http://partnermarketing.github.io/pm-image-editor/index.html)
 
 ## Screenshots
 
-![Circle Crop](https://raw.github.com/partnermarketing/pm-image-editor/master/screenshots/circle_1.jpg "Circle Crop")
-
-![Square Crop](https://raw.github.com/partnermarketing/pm-image-editor/master/screenshots/square_1.jpg "Square Crop")
+![Rectangle Crop](https://raw.github.com/partnermarketing/pm-image-editor/master/screenshots/rectangle.png "Rectangle Crop")
 
 ## Live demo
 
@@ -22,7 +20,7 @@ Demo is available on [http://partnermarketing.github.io/pm-image-editor/index.ht
 ## Requirements
 
  - AngularJS
- - Modern Browser supporting <canvas>
+ - Modern Browser supporting css transformation
 
 ## Installing
 
@@ -64,14 +62,14 @@ var myAppModule = angular.module('MyApp', ['pmImageEditor']);
 ## Usage
 
 1. Add the image editor directive `<image-editor>` to the HTML file where you want to use an image crop control. *Note:* a container, you place the directive to, should have some pre-defined size (absolute or relative to its parent). That's required, because the image crop control fits the size of its container.
-2. Bind the directive to a source image property (using **image=""** option). The directive will read the image data from that property and watch for updates. The property can be a url to an image, or a data uri.
+2. Bind the directive to a source image property (using **image=""** option). The directive will read the image data from that property and watch for updates. The property should be a url to an image.
 3. Bind the directive to a result image property (using **result-image=""** option). On each update, the directive will put the content of the crop area to that property in the data uri format.
 4. Set up the options that make sense to your application.
 5. Done!
 
 ## Result image
 
-The result image will always be a square for the both circle and square area types. It's highly recommended to store the image as a square on your back-end, because this will enable you to easily update your pics later, if you decide to implement some design changes. Showing a square image as a circle on the front-end is not a problem - it is as easy as adding a *border-radius* style for that image in a css.
+The result image will be genarated based on transformations.
 
 ## Example code
 
@@ -88,33 +86,25 @@ The following code enables to select an image using a file input and crop it. Th
       background: #E4E4E4;
       overflow: hidden;
       width:500px;
-      height:350px;
     }
   </style>
   <script>
     angular.module('app', ['pmImageEditor'])
       .controller('Ctrl', function($scope) {
-        $scope.myImage='';
-        $scope.myCroppedImage='';
-
-        var handleFileSelect=function(evt) {
-          var file=evt.currentTarget.files[0];
-          var reader = new FileReader();
-          reader.onload = function (evt) {
-            $scope.$apply(function($scope){
-              $scope.myImage=evt.target.result;
-            });
-          };
-          reader.readAsDataURL(file);
-        };
-        angular.element(document.querySelector('#fileInput')).on('change',handleFileSelect);
+        $scope.width = 500;
+        $scope.image = 'test.jpg';
+        $scope.selectionWidth = 100;
+        $scope.selectionHeight = 70;
       });
   </script>
 </head>
 <body ng-app="app" ng-controller="Ctrl">
-  <div>Select an image file: <input type="file" id="fileInput" /></div>
   <div class="cropArea">
-    <image-editor image="myImage" result-image="myCroppedImage"></image-editor>
+    <image-editor image="{{ image }}"
+                  width="{{ width }}"
+                  selection-width="{{ selectionWidth }}"
+                  selection-height="{{ selectionHeight }}"
+    ></image-editor>
   </div>
   <div>Cropped Image:</div>
   <div><img ng-src="{{myCroppedImage}}" /></div>
@@ -127,71 +117,30 @@ The following code enables to select an image using a file input and crop it. Th
 ```html
 <image-editor
     image="{string}"
-    result-image="{string}"
-   [change-on-fly="{boolean}"]
-   [area-type="{circle|square}"]
-   [area-min-size="{number}"]
-   [result-image-size="{number}"]
-   [result-image-format="{string}"]
-   [result-image-quality="{number}"]
-   [on-change="{expression}"]
-   [on-load-begin="{expression"]
-   [on-load-done="{expression"]
-   [on-load-error="{expression"]
+    width="{number}"
+    selection-width="{number}"
+    selection-height="{number}"
 ></image-editor>
 ```
 
 ### image
 
-Assignable angular expression to data-bind to. PmImageEditor gets an image for cropping from it.
+Assignable angular expression to data-bind to. PmImageEditor gets an image url for cropping from it.
 
-### result-image
+### width
 
-Assignable angular expression to data-bind to. PmImageEditor puts a data uri of a cropped image into it.
+Assignable angular expression to set editor width.
 
-### change-on-fly
+### selection-width
 
-*Optional*. By default, to reduce CPU usage, when a user drags/resizes the crop area, the result image is only updated after the user stops dragging/resizing. Set true to always update the result image as the user drags/resizes the crop area.
+Assignable angular expression to set selection area width.
 
-### area-type
+### selection-height
 
-*Optional*. Type of the crop area. Possible values: circle|square. Default: circle.
-
-### area-min-size
-
-*Optional*. Min. width/height of the crop area (in pixels). Default: 80.
-
-### result-image-size
-
-*Optional*. Width/height of the result image (in pixels). Default: 200.
-
-### result-image-format
-
-*Optional*. Format of result image. Possible values include image/jpeg, image/png, and image/webp. Browser support varies. Default: image/png.
-
-### result-image-quality
-
-*Optional*. Quality of result image. Possible values between 0.0 and 1.0 inclusive. Default: browser default.
-
-### on-change
-
-*Optional*. Expression to evaluate upon changing the cropped part of the image. The cropped image data is available as $dataURI.
-
-### on-load-begin
-
-*Optional*. Expression to evaluate when the source image starts loading.
-
-### on-load-done
-
-*Optional*. Expression to evaluate when the source image successfully loaded.
-
-### on-load-error
-
-*Optional*. Expression to evaluate when the source image didn't load.
-
+Assignable angular expression to set selection area height.
 
 ## Copyrights
 
-This project is based on [ngImgCrop](https://github.com/alexk111/ngImgCrop) by Alex Kaul.
+This project is inspired by [ngImgCrop](https://github.com/alexk111/ngImgCrop) by Alex Kaul.
 The project was not being maintained and we wanted to implement new features so we decided to take Alex's work and
 continue to share our vision along with the community.
