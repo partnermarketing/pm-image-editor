@@ -122,6 +122,14 @@ describe('pmImageEditor', function () {
 
             expect(historyFactory.historyIndex).toBe(2);
         });
+
+        it('return current history item', function() {
+            // Initial item.
+            historyFactory.historyIndex = 1;
+            historyFactory.items[1] = 'test';
+
+            expect(historyFactory.current()).toBe('test');
+        });
     });
 
 
@@ -159,11 +167,11 @@ describe('pmImageEditor', function () {
             factory.top = 1;
             factory.left = 1;
             factory.selection = {};
-            factory.wasCroppedForRotation = 1;
+            factory.wasCroppedForRotation = 90;
             factory.isCropped = true;
             factory.hFlip = true;
             factory.vFlip = true;
-            factory.rotation = 1;
+            factory.rotation = 90;
             factory.width = 1;
             factory.height = 1;
 
@@ -201,7 +209,7 @@ describe('pmImageEditor', function () {
             });
 
             it('with rotation', function() {
-                factory.rotation = 1;
+                factory.rotation = 90;
 
                 var css = {
                     position: 'absolute',
@@ -214,11 +222,11 @@ describe('pmImageEditor', function () {
 
                 expect(factory.css()).toEqual(css);
 
-                factory.rotation = 2;
+                factory.rotation = 180;
                 css.transform = 'rotate(180deg)';
                 expect(factory.css()).toEqual(css);
 
-                factory.rotation = 3;
+                factory.rotation = 270;
                 css.transform = 'rotate(270deg)';
                 expect(factory.css()).toEqual(css);
             });
@@ -237,15 +245,15 @@ describe('pmImageEditor', function () {
 
                 expect(factory.css()).toEqual(css);
 
-                factory.rotation = 1;
+                factory.rotation = 90;
                 css.transform = 'scaleX(-1) rotate(90deg)'
                 expect(factory.css()).toEqual(css);
 
-                factory.rotation = 2;
+                factory.rotation = 180;
                 css.transform = 'scaleX(-1) rotate(180deg)';
                 expect(factory.css()).toEqual(css);
 
-                factory.rotation = 3;
+                factory.rotation = 270;
                 css.transform = 'scaleX(-1) rotate(270deg)';
                 expect(factory.css()).toEqual(css);
             });
@@ -264,15 +272,15 @@ describe('pmImageEditor', function () {
 
                 expect(factory.css()).toEqual(css);
 
-                factory.rotation = 1;
+                factory.rotation = 90;
                 css.transform = 'scaleY(-1) rotate(90deg)'
                 expect(factory.css()).toEqual(css);
 
-                factory.rotation = 2;
+                factory.rotation = 180;
                 css.transform = 'scaleY(-1) rotate(180deg)';
                 expect(factory.css()).toEqual(css);
 
-                factory.rotation = 3;
+                factory.rotation = 270;
                 css.transform = 'scaleY(-1) rotate(270deg)';
                 expect(factory.css()).toEqual(css);
             });
@@ -301,7 +309,7 @@ describe('pmImageEditor', function () {
             });
 
             it('with crop on rotated image', function() {
-                factory.wasCroppedForRotation = 1;
+                factory.wasCroppedForRotation = 90;
                 expect(factory.parentSize()).toEqual({
                     width: 300,
                     height: 900
@@ -310,7 +318,7 @@ describe('pmImageEditor', function () {
 
             it('with croping on rotated image', function() {
                 factory.isCropped = true;
-                factory.wasCroppedForRotation = 1;
+                factory.wasCroppedForRotation = 90;
                 expect(factory.parentSize()).toEqual({
                     width: 300,
                     height: 600
@@ -439,11 +447,11 @@ describe('pmImageEditor', function () {
             expect(factory.isCropped).toBe(true);
             expect(factory.wasCroppedForRotation).toBe(0);
 
-            factory.rotation = 1;
+            factory.rotation = 90;
             factory.crop();
-            expect(factory.wasCroppedForRotation).toBe(1);
+            expect(factory.wasCroppedForRotation).toBe(90);
 
-            factory.rotation = 2;
+            factory.rotation = 180;
             factory.crop();
             expect(factory.wasCroppedForRotation).toBe(0);
         });
@@ -527,11 +535,11 @@ describe('pmImageEditor', function () {
             it('and keep rotation positive int from 0 to 3 rotating clock-wise', function() {
                 expect(factory.rotation).toBe(0);
                 factory.rotate('cw');
-                expect(factory.rotation).toBe(1);
+                expect(factory.rotation).toBe(90);
                 factory.rotate('cw');
-                expect(factory.rotation).toBe(2);
+                expect(factory.rotation).toBe(180);
                 factory.rotate('cw');
-                expect(factory.rotation).toBe(3);
+                expect(factory.rotation).toBe(270);
                 factory.rotate('cw');
                 expect(factory.rotation).toBe(0);
             });
@@ -539,11 +547,11 @@ describe('pmImageEditor', function () {
             it('and keep rotation positive int from 0 to 3 rotating anti-clock-wise', function() {
                 expect(factory.rotation).toBe(0);
                 factory.rotate('acw');
-                expect(factory.rotation).toBe(3);
+                expect(factory.rotation).toBe(270);
                 factory.rotate('acw');
-                expect(factory.rotation).toBe(2);
+                expect(factory.rotation).toBe(180);
                 factory.rotate('acw');
-                expect(factory.rotation).toBe(1);
+                expect(factory.rotation).toBe(90);
                 factory.rotate('acw');
                 expect(factory.rotation).toBe(0);
             });
@@ -750,7 +758,7 @@ describe('pmImageEditor', function () {
             expect(scope.updateEditorCss).toHaveBeenCalled();
         });
 
-        it('should update child css', function() {
+        it('should update child css ant update state', function() {
             createCtrl();
 
             scope.imageElement = {
@@ -768,6 +776,7 @@ describe('pmImageEditor', function () {
             expect(scope.imageElement.parent().css).toHaveBeenCalledWith(scope.editor.parentCss());
             expect(scope.$broadcast).toHaveBeenCalledWith('updateSelection', scope.editorId, scope.editor.selectionCss());
             expect(scope.updateHistoryButtons).toHaveBeenCalled();
+            expect(scope.state).toEqual(scope.editor.history.current());
         });
 
         it('should allow to disableButton undo/redo buttons state', function() {
@@ -803,7 +812,7 @@ describe('pmImageEditor', function () {
         beforeEach(inject(function($rootScope, $compile) {
             scope = $rootScope.$new();
 
-            element = angular.element('<image-editor image="" width="200" selectionWidth="10" selectionHeight="5"></image-editor>');
+            element = angular.element('<image-editor image="" width="200" selectionWidth="10" selectionHeight="5" state="state"></image-editor>');
 
             $compile(element)(scope);
             scope.$digest();
@@ -813,6 +822,7 @@ describe('pmImageEditor', function () {
 
         it('should set imageElement to scope', function() {
             expect(scope.imageElement).toBeDefined();
+            expect(scope.state).toEqual(jasmine.any(Object));
         });
 
         it('should append required elements', function() {

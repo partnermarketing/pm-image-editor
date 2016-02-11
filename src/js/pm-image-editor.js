@@ -56,12 +56,16 @@
                 this.historyIndex += offset;
 
                 angular.forEach(
-                    this.items[this.historyIndex],
+                    this.current(),
                     function(val, key) {
                         this.editor[key] = angular.isObject(val) ? angular.copy(val) : val;
                     },
                     this
                 );
+            };
+
+            ImageHistoryFactory.prototype.current = function() {
+                return this.items[this.historyIndex];
             };
 
             return ImageHistoryFactory;
@@ -110,11 +114,7 @@
                 this.hFlip = false;
                 this.vFlip = false;
 
-                // Rotation value. Can be one of the following values:
-                //   0 - 0deg rotation,
-                //   1 - 90deg rotation,
-                //   2 - 180deg rotation,
-                //   3 - 270deg rotation.
+                // Rotation value in degrees from 0-360.
                 this.rotation = 0;
 
                 // Initially image should fit visible area.
@@ -137,7 +137,7 @@
                     transform.push('scaleY(-1)');
                 }
                 if (this.rotation) {
-                    transform.push('rotate('+90*this.rotation+'deg)');
+                    transform.push('rotate('+this.rotation+'deg)');
                 }
 
                 return {
@@ -163,7 +163,7 @@
 
                 return {
                     width: w,
-                    height: (this.rotation % 2 === this.wasCroppedForRotation) ? w/r : w*r
+                    height: (this.rotation % 180 === this.wasCroppedForRotation) ? w/r : w*r
                 };
             };
 
@@ -278,7 +278,7 @@
                 this.height = this.width/this.ratio;
 
                 this.isCropped = true;
-                this.wasCroppedForRotation = this.rotation % 2;
+                this.wasCroppedForRotation = this.rotation % 180;
 
                 var parentSize = this.parentSize();
                 this.selection.top = 0;
@@ -334,9 +334,9 @@
             ImageEditorFactory.prototype.rotate = function(direction) {
                 //this.isCropped = false;
                 // Update rotation value depends on direction.
-                this.rotation += direction === 'cw' ? 1 : -1;
-                // Make sure that rotation stays positive in range 0-3.
-                this.rotation = (this.rotation + 4)%4;
+                this.rotation += direction === 'cw' ? 90 : -90;
+                // Make sure that rotation stays positive in range 0-360.
+                this.rotation = (this.rotation + 360)%360;
 
                 var s = this.parentSize();
 
@@ -444,6 +444,14 @@
                     $scope.$broadcast('updateSelection', $scope.editorId, $scope.editor.selectionCss());
 
                     $scope.updateHistoryButtons();
+
+                    $scope.state = angular.copy($scope.editor.history.current());
+                    // For some reason without this $apply() parent variable, that linked to "state"
+                    // is not updated.
+                    // But $apply is triggering an issue during init stage. So moved this to setTimeout.
+                    setTimeout(function() {
+                        $scope.$apply();
+                    }, 0);
                 }
             };
 
@@ -497,7 +505,8 @@
                     image: '@',
                     width: '@',
                     selectionWidth: '@',
-                    selectionHeight: '@'
+                    selectionHeight: '@',
+                    state: '='
                 },
                 controller: 'ImageEditorController',
                 template: '\
