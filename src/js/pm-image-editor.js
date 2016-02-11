@@ -114,11 +114,7 @@
                 this.hFlip = false;
                 this.vFlip = false;
 
-                // Rotation value. Can be one of the following values:
-                //   0 - 0deg rotation,
-                //   1 - 90deg rotation,
-                //   2 - 180deg rotation,
-                //   3 - 270deg rotation.
+                // Rotation value in degrees from 0-360.
                 this.rotation = 0;
 
                 // Initially image should fit visible area.
@@ -141,7 +137,7 @@
                     transform.push('scaleY(-1)');
                 }
                 if (this.rotation) {
-                    transform.push('rotate('+90*this.rotation+'deg)');
+                    transform.push('rotate('+this.rotation+'deg)');
                 }
 
                 return {
@@ -167,7 +163,7 @@
 
                 return {
                     width: w,
-                    height: (this.rotation % 2 === this.wasCroppedForRotation) ? w/r : w*r
+                    height: (this.rotation % 180 === this.wasCroppedForRotation) ? w/r : w*r
                 };
             };
 
@@ -282,7 +278,7 @@
                 this.height = this.width/this.ratio;
 
                 this.isCropped = true;
-                this.wasCroppedForRotation = this.rotation % 2;
+                this.wasCroppedForRotation = this.rotation % 180;
 
                 var parentSize = this.parentSize();
                 this.selection.top = 0;
@@ -338,9 +334,9 @@
             ImageEditorFactory.prototype.rotate = function(direction) {
                 //this.isCropped = false;
                 // Update rotation value depends on direction.
-                this.rotation += direction === 'cw' ? 1 : -1;
-                // Make sure that rotation stays positive in range 0-3.
-                this.rotation = (this.rotation + 4)%4;
+                this.rotation += direction === 'cw' ? 90 : -90;
+                // Make sure that rotation stays positive in range 0-360.
+                this.rotation = (this.rotation + 360)%360;
 
                 var s = this.parentSize();
 

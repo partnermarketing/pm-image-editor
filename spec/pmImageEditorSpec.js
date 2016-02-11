@@ -167,11 +167,11 @@ describe('pmImageEditor', function () {
             factory.top = 1;
             factory.left = 1;
             factory.selection = {};
-            factory.wasCroppedForRotation = 1;
+            factory.wasCroppedForRotation = 90;
             factory.isCropped = true;
             factory.hFlip = true;
             factory.vFlip = true;
-            factory.rotation = 1;
+            factory.rotation = 90;
             factory.width = 1;
             factory.height = 1;
 
@@ -209,7 +209,7 @@ describe('pmImageEditor', function () {
             });
 
             it('with rotation', function() {
-                factory.rotation = 1;
+                factory.rotation = 90;
 
                 var css = {
                     position: 'absolute',
@@ -222,11 +222,11 @@ describe('pmImageEditor', function () {
 
                 expect(factory.css()).toEqual(css);
 
-                factory.rotation = 2;
+                factory.rotation = 180;
                 css.transform = 'rotate(180deg)';
                 expect(factory.css()).toEqual(css);
 
-                factory.rotation = 3;
+                factory.rotation = 270;
                 css.transform = 'rotate(270deg)';
                 expect(factory.css()).toEqual(css);
             });
@@ -245,15 +245,15 @@ describe('pmImageEditor', function () {
 
                 expect(factory.css()).toEqual(css);
 
-                factory.rotation = 1;
+                factory.rotation = 90;
                 css.transform = 'scaleX(-1) rotate(90deg)'
                 expect(factory.css()).toEqual(css);
 
-                factory.rotation = 2;
+                factory.rotation = 180;
                 css.transform = 'scaleX(-1) rotate(180deg)';
                 expect(factory.css()).toEqual(css);
 
-                factory.rotation = 3;
+                factory.rotation = 270;
                 css.transform = 'scaleX(-1) rotate(270deg)';
                 expect(factory.css()).toEqual(css);
             });
@@ -272,15 +272,15 @@ describe('pmImageEditor', function () {
 
                 expect(factory.css()).toEqual(css);
 
-                factory.rotation = 1;
+                factory.rotation = 90;
                 css.transform = 'scaleY(-1) rotate(90deg)'
                 expect(factory.css()).toEqual(css);
 
-                factory.rotation = 2;
+                factory.rotation = 180;
                 css.transform = 'scaleY(-1) rotate(180deg)';
                 expect(factory.css()).toEqual(css);
 
-                factory.rotation = 3;
+                factory.rotation = 270;
                 css.transform = 'scaleY(-1) rotate(270deg)';
                 expect(factory.css()).toEqual(css);
             });
@@ -309,7 +309,7 @@ describe('pmImageEditor', function () {
             });
 
             it('with crop on rotated image', function() {
-                factory.wasCroppedForRotation = 1;
+                factory.wasCroppedForRotation = 90;
                 expect(factory.parentSize()).toEqual({
                     width: 300,
                     height: 900
@@ -318,7 +318,7 @@ describe('pmImageEditor', function () {
 
             it('with croping on rotated image', function() {
                 factory.isCropped = true;
-                factory.wasCroppedForRotation = 1;
+                factory.wasCroppedForRotation = 90;
                 expect(factory.parentSize()).toEqual({
                     width: 300,
                     height: 600
@@ -447,11 +447,11 @@ describe('pmImageEditor', function () {
             expect(factory.isCropped).toBe(true);
             expect(factory.wasCroppedForRotation).toBe(0);
 
-            factory.rotation = 1;
+            factory.rotation = 90;
             factory.crop();
-            expect(factory.wasCroppedForRotation).toBe(1);
+            expect(factory.wasCroppedForRotation).toBe(90);
 
-            factory.rotation = 2;
+            factory.rotation = 180;
             factory.crop();
             expect(factory.wasCroppedForRotation).toBe(0);
         });
@@ -535,11 +535,11 @@ describe('pmImageEditor', function () {
             it('and keep rotation positive int from 0 to 3 rotating clock-wise', function() {
                 expect(factory.rotation).toBe(0);
                 factory.rotate('cw');
-                expect(factory.rotation).toBe(1);
+                expect(factory.rotation).toBe(90);
                 factory.rotate('cw');
-                expect(factory.rotation).toBe(2);
+                expect(factory.rotation).toBe(180);
                 factory.rotate('cw');
-                expect(factory.rotation).toBe(3);
+                expect(factory.rotation).toBe(270);
                 factory.rotate('cw');
                 expect(factory.rotation).toBe(0);
             });
@@ -547,11 +547,11 @@ describe('pmImageEditor', function () {
             it('and keep rotation positive int from 0 to 3 rotating anti-clock-wise', function() {
                 expect(factory.rotation).toBe(0);
                 factory.rotate('acw');
-                expect(factory.rotation).toBe(3);
+                expect(factory.rotation).toBe(270);
                 factory.rotate('acw');
-                expect(factory.rotation).toBe(2);
+                expect(factory.rotation).toBe(180);
                 factory.rotate('acw');
-                expect(factory.rotation).toBe(1);
+                expect(factory.rotation).toBe(90);
                 factory.rotate('acw');
                 expect(factory.rotation).toBe(0);
             });
