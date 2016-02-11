@@ -122,6 +122,14 @@ describe('pmImageEditor', function () {
 
             expect(historyFactory.historyIndex).toBe(2);
         });
+
+        it('return current history item', function() {
+            // Initial item.
+            historyFactory.historyIndex = 1;
+            historyFactory.items[1] = 'test';
+
+            expect(historyFactory.current()).toBe('test');
+        });
     });
 
 
@@ -750,7 +758,7 @@ describe('pmImageEditor', function () {
             expect(scope.updateEditorCss).toHaveBeenCalled();
         });
 
-        it('should update child css', function() {
+        it('should update child css ant update state', function() {
             createCtrl();
 
             scope.imageElement = {
@@ -768,6 +776,7 @@ describe('pmImageEditor', function () {
             expect(scope.imageElement.parent().css).toHaveBeenCalledWith(scope.editor.parentCss());
             expect(scope.$broadcast).toHaveBeenCalledWith('updateSelection', scope.editorId, scope.editor.selectionCss());
             expect(scope.updateHistoryButtons).toHaveBeenCalled();
+            expect(scope.state).toEqual(scope.editor.history.current());
         });
 
         it('should allow to disableButton undo/redo buttons state', function() {
@@ -803,7 +812,7 @@ describe('pmImageEditor', function () {
         beforeEach(inject(function($rootScope, $compile) {
             scope = $rootScope.$new();
 
-            element = angular.element('<image-editor image="" width="200" selectionWidth="10" selectionHeight="5"></image-editor>');
+            element = angular.element('<image-editor image="" width="200" selectionWidth="10" selectionHeight="5" state="state"></image-editor>');
 
             $compile(element)(scope);
             scope.$digest();
@@ -813,6 +822,7 @@ describe('pmImageEditor', function () {
 
         it('should set imageElement to scope', function() {
             expect(scope.imageElement).toBeDefined();
+            expect(scope.state).toEqual(jasmine.any(Object));
         });
 
         it('should append required elements', function() {

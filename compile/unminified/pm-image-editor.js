@@ -5,7 +5,7 @@
  * Copyright (c) 2016 Partnermarketing.com
  * License: MIT
  *
- * Generated at Tuesday, February 9th, 2016, 10:01:54 AM
+ * Generated at Thursday, February 11th, 2016, 8:54:58 AM
  */
 (function() {
 'use strict';
@@ -918,12 +918,16 @@
                 this.historyIndex += offset;
 
                 angular.forEach(
-                    this.items[this.historyIndex],
+                    this.current(),
                     function(val, key) {
                         this.editor[key] = angular.isObject(val) ? angular.copy(val) : val;
                     },
                     this
                 );
+            };
+
+            ImageHistoryFactory.prototype.current = function() {
+                return this.items[this.historyIndex];
             };
 
             return ImageHistoryFactory;
@@ -1305,6 +1309,11 @@
                     $scope.$broadcast('updateSelection', $scope.editorId, $scope.editor.selectionCss());
 
                     $scope.updateHistoryButtons();
+
+                    $scope.state = angular.copy($scope.editor.history.current());
+                    setTimeout(function() {
+                        $scope.$apply();
+                    }, 0);
                 }
             };
 
@@ -1358,7 +1367,8 @@
                     image: '@',
                     width: '@',
                     selectionWidth: '@',
-                    selectionHeight: '@'
+                    selectionHeight: '@',
+                    state: '='
                 },
                 controller: 'ImageEditorController',
                 template: '\

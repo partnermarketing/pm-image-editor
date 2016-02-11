@@ -56,12 +56,16 @@
                 this.historyIndex += offset;
 
                 angular.forEach(
-                    this.items[this.historyIndex],
+                    this.current(),
                     function(val, key) {
                         this.editor[key] = angular.isObject(val) ? angular.copy(val) : val;
                     },
                     this
                 );
+            };
+
+            ImageHistoryFactory.prototype.current = function() {
+                return this.items[this.historyIndex];
             };
 
             return ImageHistoryFactory;
@@ -444,6 +448,14 @@
                     $scope.$broadcast('updateSelection', $scope.editorId, $scope.editor.selectionCss());
 
                     $scope.updateHistoryButtons();
+
+                    $scope.state = angular.copy($scope.editor.history.current());
+                    // For some reason without this $apply() parent variable, that linked to "state"
+                    // is not updated.
+                    // But $apply is triggering an issue during init stage. So moved this to setTimeout.
+                    setTimeout(function() {
+                        $scope.$apply();
+                    }, 0);
                 }
             };
 
@@ -497,7 +509,8 @@
                     image: '@',
                     width: '@',
                     selectionWidth: '@',
-                    selectionHeight: '@'
+                    selectionHeight: '@',
+                    state: '='
                 },
                 controller: 'ImageEditorController',
                 template: '\

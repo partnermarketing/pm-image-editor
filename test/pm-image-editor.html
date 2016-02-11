@@ -52,8 +52,12 @@
                   width="{{ width }}"
                   selection-width="{{ selectionWidth }}"
                   selection-height="{{ selectionHeight }}"
+                  state="state"
     ></image-editor>
   </div>
+
+  <h1>State JSON:</h1>
+  {{ state | json }}
 
   <script type="text/javascript">
     angular.module('app', ['pmImageEditor'])
@@ -69,7 +73,7 @@
         $scope.image = 'test.jpg';
         $scope.selectionWidth = 100;
         $scope.selectionHeight = 70;
-
+        $scope.state = {};
 
         $scope.$watch('size', function(value) {
           if (value) {
