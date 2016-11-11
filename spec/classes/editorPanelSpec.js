@@ -20,7 +20,7 @@ describe('Editor panel', function () {
         it('should have required buttons', function() {
             var buttonNames = 'crop,rotate-cw,rotate-acw,flip-h,flip-v';
             buttonNames.split(',').forEach(function(name) {
-                expect(element.html()).toContain('<span class="image-editor-'+name+'">');
+                expect(element.html()).toContain('<span class="image-editor-'+name+'"');
             });
         });
 

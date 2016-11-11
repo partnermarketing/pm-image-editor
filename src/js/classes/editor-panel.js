@@ -9,10 +9,11 @@
             },
             link: function (scope, element) {
                 var buttonNames = 'crop,rotate-cw,rotate-acw,flip-h,flip-v,undo,redo';
+                var buttonLabels = ['Crop', 'Rotate Clockwise', 'Rotate Counterclockwise', 'Flip Horizontal', 'Flip Vertical', 'Undo', 'Redo'];
                 var buttons = {};
-                buttonNames.split(',').forEach(function(name){
+                buttonNames.split(',').forEach(function(name, index){
                     buttons[name] = angular
-                        .element('<span class="image-editor-'+name+'" />')
+                        .element('<span class="image-editor-'+name+'" title="'+buttonLabels[index]+'" />')
                         .on('click', function() {
                             scope.$emit('editorButtonClick', {
                                 name: name

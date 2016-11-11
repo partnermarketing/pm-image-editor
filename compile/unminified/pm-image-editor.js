@@ -5,7 +5,7 @@
  * Copyright (c) 2016 Partnermarketing.com
  * License: MIT
  *
- * Generated at Thursday, February 11th, 2016, 12:58:09 PM
+ * Generated at Friday, November 11th, 2016, 9:15:39 AM
  */
 (function() {
 'use strict';
@@ -198,10 +198,11 @@
             },
             link: function (scope, element) {
                 var buttonNames = 'crop,rotate-cw,rotate-acw,flip-h,flip-v,undo,redo';
+                var buttonLabels = ['Crop', 'Rotate Clockwise', 'Rotate Counterclockwise', 'Flip Horizontal', 'Flip Vertical', 'Undo', 'Redo'];
                 var buttons = {};
-                buttonNames.split(',').forEach(function(name){
+                buttonNames.split(',').forEach(function(name, index){
                     buttons[name] = angular
-                        .element('<span class="image-editor-'+name+'" />')
+                        .element('<span class="image-editor-'+name+'" title="'+buttonLabels[index]+'" />')
                         .on('click', function() {
                             scope.$emit('editorButtonClick', {
                                 name: name
