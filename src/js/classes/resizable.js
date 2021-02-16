@@ -423,7 +423,7 @@
 
       return ResizableFactory;
     }).
-    controller('ResizableController', function($scope, $document, $rootScope, ResizableFactory) {
+    controller('ResizableController', ['$scope', '$document', '$rootScope', 'ResizableFactory', function($scope, $document, $rootScope, ResizableFactory) {
       $scope.resizableFactory = new ResizableFactory({
         minHeight: 20,
         minWidth: 20
@@ -476,7 +476,7 @@
 
         $rootScope.$broadcast('resizeStop', event, $scope.resizableUiParams());
       };
-    }).
+    }]).
     directive('resizable', function() {
       return {
         restrict: 'A',

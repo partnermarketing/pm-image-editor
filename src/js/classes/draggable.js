@@ -114,7 +114,7 @@
 
       return DraggableFactory;
     }).
-    controller('DraggableController', function($scope, $document, $rootScope, DraggableFactory) {
+    controller('DraggableController', ['$scope', '$document', '$rootScope', 'DraggableFactory', function($scope, $document, $rootScope, DraggableFactory) {
       $scope.draggableFactory = new DraggableFactory();
 
       $scope.draggableUiParams = function() {
@@ -153,7 +153,7 @@
 
         $rootScope.$broadcast('dragStop', event, $scope.draggableUiParams());
       };
-    }).
+    }]).
     directive('draggable', function() {
       return {
         restrict: 'A',
