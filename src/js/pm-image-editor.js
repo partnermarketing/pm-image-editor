@@ -70,7 +70,7 @@
 
             return ImageHistoryFactory;
         })
-        .factory('ImageEditorFactory', function (ImageHistoryFactory) {
+        .factory('ImageEditorFactory', ['ImageHistoryFactory', function (ImageHistoryFactory) {
             var ImageEditorFactory = function(options) {
                 this.options = options;
                 // Visible area width. Image should always fit
@@ -387,8 +387,8 @@
             };
 
             return ImageEditorFactory;
-        })
-        .controller('ImageEditorController', function($scope, ImageEditorFactory) {
+        }])
+        .controller('ImageEditorController', ['$scope', 'ImageEditorFactory', function($scope, ImageEditorFactory) {
             // Create new editor instance and generate uniq id to use in
             // image-selection directive (in case if few editors are present on the same page).
             $scope.editor = new ImageEditorFactory({
@@ -497,7 +497,7 @@
 
             $scope.$watch('selectionWidth', handleSelectionDimensions);
             $scope.$watch('selectionHeight', handleSelectionDimensions);
-        })
+        }])
         .directive('imageEditor', function () {
             return {
                 restrict: 'E',
