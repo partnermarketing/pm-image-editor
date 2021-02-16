@@ -1,11 +1,11 @@
 /*!
- * undefined v0.5.0
+ * undefined v0.5.4
  * https://github.com/partnermarketing/pm-image-editor
  *
- * Copyright (c) 2016 Partnermarketing.com
+ * Copyright (c) 2021 Partnermarketing.com
  * License: MIT
  *
- * Generated at Friday, November 11th, 2016, 9:15:39 AM
+ * Generated at Tuesday, February 16th, 2021, 12:34:47 PM
  */
 (function() {
 'use strict';
@@ -130,7 +130,7 @@
 
       return DraggableFactory;
     }).
-    controller('DraggableController', function($scope, $document, $rootScope, DraggableFactory) {
+    controller('DraggableController', ['$scope', '$document', '$rootScope', 'DraggableFactory', function($scope, $document, $rootScope, DraggableFactory) {
       $scope.draggableFactory = new DraggableFactory();
 
       $scope.draggableUiParams = function() {
@@ -169,7 +169,7 @@
 
         $rootScope.$broadcast('dragStop', event, $scope.draggableUiParams());
       };
-    }).
+    }]).
     directive('draggable', function() {
       return {
         restrict: 'A',
@@ -782,7 +782,7 @@
 
       return ResizableFactory;
     }).
-    controller('ResizableController', function($scope, $document, $rootScope, ResizableFactory) {
+    controller('ResizableController', ['$scope', '$document', '$rootScope', 'ResizableFactory', function($scope, $document, $rootScope, ResizableFactory) {
       $scope.resizableFactory = new ResizableFactory({
         minHeight: 20,
         minWidth: 20
@@ -835,7 +835,7 @@
 
         $rootScope.$broadcast('resizeStop', event, $scope.resizableUiParams());
       };
-    }).
+    }]).
     directive('resizable', function() {
       return {
         restrict: 'A',
@@ -933,7 +933,7 @@
 
             return ImageHistoryFactory;
         })
-        .factory('ImageEditorFactory', function (ImageHistoryFactory) {
+        .factory('ImageEditorFactory', ['ImageHistoryFactory', function (ImageHistoryFactory) {
             var ImageEditorFactory = function(options) {
                 this.options = options;
                 // Visible area width. Image should always fit
@@ -1249,8 +1249,8 @@
             };
 
             return ImageEditorFactory;
-        })
-        .controller('ImageEditorController', function($scope, ImageEditorFactory) {
+        }])
+        .controller('ImageEditorController', ['$scope', 'ImageEditorFactory', function($scope, ImageEditorFactory) {
             // Create new editor instance and generate uniq id to use in
             // image-selection directive (in case if few editors are present on the same page).
             $scope.editor = new ImageEditorFactory({
@@ -1359,7 +1359,7 @@
 
             $scope.$watch('selectionWidth', handleSelectionDimensions);
             $scope.$watch('selectionHeight', handleSelectionDimensions);
-        })
+        }])
         .directive('imageEditor', function () {
             return {
                 restrict: 'E',
