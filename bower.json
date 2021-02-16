@@ -4,7 +4,8 @@
   "authors": [
     "Partnermarketing.com <developers@partnermarketing.com>",
     "Bernardo Silva <benny.stuff@gmail.com>",
-    "Amy Boyd <amy@amyboyd.co.uk>"
+    "Amy Boyd <amy@amyboyd.co.uk>",
+    "Anton Vasilyev <antonvas@gmail.com>"
   ],
   "description": "Image directive for AngularJS that allows to crop, flip, rotate.",
   "main": [
